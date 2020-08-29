@@ -10,8 +10,13 @@
 			 HorizontalAlignment ="Stretch" HorizontalContentAlignment ="Stretch" VerticalAlignment ="Stretch" VerticalContentAlignment ="Stretch">
 	<UserControl.Resources>
 		<local:InnerGrid x:Key="grid"/>
+		<Style x:Key="openBorder" TargetType="Border">
+			<Setter Property="BorderThickness" Value="2"/>
+			<Setter Property="BorderBrush" Value="DarkGray"/>
+			<Setter Property="Background" Value="#FFD5D2D2"/>
+		</Style>
 		<DataTemplate x:Key ="CellTemplate">
-			<Border x:Name ="Border" BorderBrush ="DimGray" BorderThickness ="1">
+			<Border Style="{StaticResource openBorder}">
 				<Viewbox>
 					<TextBlock HorizontalAlignment ="Center" VerticalAlignment ="Center" Text ="{Binding Path=Value}"/>
 				</Viewbox>
