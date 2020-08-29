@@ -1,43 +1,33 @@
-﻿<UserControl x:Class="WpfSudoku.SudokuBoard"
+﻿<UserControl x:Class="WpfSudoku.ItemGrid"
 			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:local="clr-namespace:WpfSudoku"
 			 mc:Ignorable="d" 
-			 d:DesignHeight="450" d:DesignWidth="450"
+			 d:DesignHeight="450" d:DesignWidth="450" d:DataContext="{DynamicResource grid}" 
 			 Width="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}"
 			 HorizontalAlignment ="Stretch" HorizontalContentAlignment ="Stretch" VerticalAlignment ="Stretch" VerticalContentAlignment ="Stretch">
 	<UserControl.Resources>
-		<local:InnerGrid x:Key="grid"/>
-		<Style x:Key="openBorder" TargetType="Border">
-			<Setter Property="BorderThickness" Value="2"/>
-			<Setter Property="BorderBrush" Value="DarkGray"/>
-			<Setter Property="Background" Value="#FFD5D2D2"/>
+		<local:BlockViewModel x:Key="grid"/>
+		<Style x:Key="cellBorder" TargetType="Border">
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource borderBrush}"/>
+			<Setter Property="Background" Value="{DynamicResource backgroundBrush}"/>
 		</Style>
 		<DataTemplate x:Key ="CellTemplate">
-			<Border Style="{StaticResource openBorder}">
+			<Border Style="{StaticResource cellBorder}">
 				<Viewbox>
 					<TextBlock HorizontalAlignment ="Center" VerticalAlignment ="Center" Text ="{Binding Path=Value}"/>
 				</Viewbox>
 			</Border>
 		</DataTemplate>
-
-		<DataTemplate x:Key ="InnerGridTemplate">
-			<ItemsControl ItemsSource ="{Binding}" ItemTemplate ="{StaticResource CellTemplate}">
-				<ItemsControl.ItemsPanel>
-					<ItemsPanelTemplate>
-						<UniformGrid Rows ="1"/>
-					</ItemsPanelTemplate>
-				</ItemsControl.ItemsPanel>
-			</ItemsControl>
-		</DataTemplate>
 	</UserControl.Resources>
 
-	<ItemsControl ItemTemplate ="{StaticResource InnerGridTemplate}" ItemsSource ="{Binding Path=GridRows}" DataContext="{DynamicResource grid}">
+	<ItemsControl ItemsSource ="{Binding Path=Items}" ItemTemplate ="{StaticResource CellTemplate}">
 		<ItemsControl.ItemsPanel>
 			<ItemsPanelTemplate>
-				<UniformGrid Columns ="1"/>
+				<UniformGrid Background="{DynamicResource borderBrush}"/>
 			</ItemsPanelTemplate>
 		</ItemsControl.ItemsPanel>
 	</ItemsControl>

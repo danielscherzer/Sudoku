@@ -5,9 +5,9 @@ namespace WpfSudoku
 	/// <summary>
 	/// Interaction logic for SudokuBoard.xaml
 	/// </summary>
-	public partial class SudokuBoard : UserControl
+	public partial class ItemGrid : UserControl
 	{
-		public SudokuBoard()
+		public ItemGrid()
 		{
 			InitializeComponent();
 		}

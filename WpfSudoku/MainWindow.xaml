@@ -5,8 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfSudoku"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" Background="{DynamicResource borderBrush}">
+	<Window.Resources>
+		<local:BlockViewModel x:Key="block"/>
+	</Window.Resources>
     <Grid>
-		<local:SudokuBoard HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5"/>
+		<local:ItemGrid Margin="5" DataContext="{DynamicResource block}"/>
 	</Grid>
 </Window>

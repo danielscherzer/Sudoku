@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:WpfSudoku"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
-    </Application.Resources>
+		<SolidColorBrush x:Key="backgroundBrush" Color="#FFD5D2D2"/>
+		<SolidColorBrush x:Key="borderBrush" Color="DarkGray"/>
+	</Application.Resources>
 </Application>
