@@ -7,9 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" Background="{DynamicResource borderBrush}">
 	<Window.Resources>
-		<local:BlockViewModel x:Key="block"/>
+		<local:GridViewModel x:Key="grid"/>
 	</Window.Resources>
     <Grid>
-		<local:ItemGrid Margin="5" DataContext="{DynamicResource block}"/>
+		<local:ItemGrid Margin="5" DataContext="{DynamicResource grid}"/>
 	</Grid>
 </Window>

@@ -9,7 +9,7 @@
 			 Width="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}"
 			 HorizontalAlignment ="Stretch" HorizontalContentAlignment ="Stretch" VerticalAlignment ="Stretch" VerticalContentAlignment ="Stretch">
 	<UserControl.Resources>
-		<local:BlockViewModel x:Key="grid"/>
+		<local:GridViewModel x:Key="grid"/>
 		<Style x:Key="cellBorder" TargetType="Border">
 			<Setter Property="BorderThickness" Value="1"/>
 			<Setter Property="BorderBrush" Value="{DynamicResource borderBrush}"/>
@@ -22,9 +22,20 @@
 				</Viewbox>
 			</Border>
 		</DataTemplate>
+		<DataTemplate x:Key ="BlockTemplate">
+			<Border Style="{StaticResource cellBorder}">
+				<ItemsControl ItemsSource ="{Binding Path=Items}" ItemTemplate ="{StaticResource CellTemplate}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<UniformGrid Background="{DynamicResource borderBrush}"/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
+			</Border>
+		</DataTemplate>
 	</UserControl.Resources>
 
-	<ItemsControl ItemsSource ="{Binding Path=Items}" ItemTemplate ="{StaticResource CellTemplate}">
+	<ItemsControl ItemsSource ="{Binding Path=Blocks}" ItemTemplate ="{StaticResource BlockTemplate}">
 		<ItemsControl.ItemsPanel>
 			<ItemsPanelTemplate>
 				<UniformGrid Background="{DynamicResource borderBrush}"/>

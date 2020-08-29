@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace WpfSudoku
 {
-	public class GridViewModel<Cell> : ViewModel where Cell : INotifyPropertyChanged, new()
+	public class GridViewModel : ViewModel
 	{
 		public GridViewModel() : this(3) { }
 
@@ -13,16 +13,16 @@ namespace WpfSudoku
 			{
 				for (int j = 0; j < size; j++)
 				{
-					var cell = new Cell();
+					var cell = new BlockViewModel(size);
 					cell.PropertyChanged += CellPropertyChanged;
-					Items.Add(cell);
+					Blocks.Add(cell);
 				}
 			}
 		}
 
 		public bool IsValid { get; private set; } = true;
 
-		public ObservableCollection<Cell> Items { get; } = new ObservableCollection<Cell>();
+		public ObservableCollection<BlockViewModel> Blocks { get; } = new ObservableCollection<BlockViewModel>();
 
 		void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{

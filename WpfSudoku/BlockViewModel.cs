@@ -5,7 +5,7 @@ namespace WpfSudoku
 {
 	public class BlockViewModel : ViewModel
 	{
-		public BlockViewModel(): this(3) { }
+		public BlockViewModel(): this(9) { }
 
 		public BlockViewModel(int size)
 		{
