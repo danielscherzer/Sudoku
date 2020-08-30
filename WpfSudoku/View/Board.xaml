@@ -5,34 +5,52 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:WpfSudoku.ViewModel"
 			 mc:Ignorable="d" 
-			 d:DesignHeight="450" d:DesignWidth="450" d:DataContext="{DynamicResource grid}" 
+			 d:DesignHeight="450" d:DesignWidth="450" d:DataContext="{DynamicResource board}" 
 			 Width="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}"
 			 HorizontalAlignment ="Stretch" HorizontalContentAlignment ="Stretch" VerticalAlignment ="Stretch" VerticalContentAlignment ="Stretch">
 	<UserControl.Resources>
-		<vm:BoardViewModel x:Key="grid"/>
+		<vm:BoardViewModel x:Key="board"/>
 		<Style x:Key="cellBorder" TargetType="Border">
 			<Setter Property="BorderBrush" Value="{DynamicResource borderBrush}"/>
 			<Setter Property="Background" Value="{DynamicResource backgroundBrush}"/>
 		</Style>
-		<DataTemplate x:Key ="CellTemplate">
-			<Border Style="{StaticResource cellBorder}" Width="30" Height="30" BorderThickness="0.1">
-				<TextBlock HorizontalAlignment ="Center" VerticalAlignment ="Center" FontSize="24" Foreground="{DynamicResource borderBrush}" Text ="{Binding Path=Value}"/>
-			</Border>
+		<DataTemplate x:Key ="cellTemplate">
+			<TextBlock HorizontalAlignment ="Center" VerticalAlignment ="Center" FontSize="24" Foreground="{DynamicResource borderBrush}" Text ="{Binding Value}"/>
 		</DataTemplate>
+		<DataTemplate x:Key ="emptyCellTemplate"/>
+
+		<!--cell style for template selection-->
+		<Style x:Key="cell" TargetType="ContentPresenter">
+			<Setter Property="ContentTemplate" Value="{StaticResource cellTemplate}"/>
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding Value}" Value="0">
+					<Setter Property="ContentTemplate" Value="{StaticResource emptyCellTemplate}"/>
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+		<!--block-->
 		<DataTemplate x:Key ="BlockTemplate">
 			<Border Style="{StaticResource cellBorder}" BorderThickness="1" Margin="-0.5">
-				<ItemsControl ItemsSource ="{Binding Path=Items}" ItemTemplate ="{StaticResource CellTemplate}">
+				<ItemsControl ItemsSource ="{Binding Items}">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
 							<UniformGrid Background="{DynamicResource borderBrush}"/>
 						</ItemsPanelTemplate>
 					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Border Style="{StaticResource cellBorder}" Width="30" Height="30" BorderThickness="0.1">
+								<ContentPresenter Content="{Binding}" Style="{StaticResource cell}"/>
+							</Border>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
 				</ItemsControl>
 			</Border>
 		</DataTemplate>
 	</UserControl.Resources>
+	<!--board-->
 	<Viewbox>
-		<ItemsControl ItemsSource ="{Binding Path=Blocks}" ItemTemplate ="{StaticResource BlockTemplate}">
+		<ItemsControl ItemsSource ="{Binding Blocks}" ItemTemplate ="{StaticResource BlockTemplate}">
 			<ItemsControl.ItemsPanel>
 				<ItemsPanelTemplate>
 					<UniformGrid Background="{DynamicResource borderBrush}"/>

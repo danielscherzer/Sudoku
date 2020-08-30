@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace WpfSudoku.ViewModel
@@ -15,27 +16,30 @@ namespace WpfSudoku.ViewModel
 				{
 					CellViewModel cell = new CellViewModel
 					{
-						Value = i * size + j + 1
+						//Value = i * size + j
 					};
 					cell.PropertyChanged += CellPropertyChanged;
 					Items.Add(cell);
 				}
 			}
+			Size = size;
 		}
 
 		public bool IsValid { get; private set; } = true;
 
-		//public Cell this[int row, int col]
-		//{
-		//	get
-		//	{
-		//		if (row < 0 || row >= Items.Count) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
-		//		if (col < 0 || col >= Items.Count) throw new ArgumentOutOfRangeException(nameof(col), col, "Invalid Column Index");
-		//		return Items[row][col];
-		//	}
-		//}
+		public CellViewModel this[int row, int col]
+		{
+			get
+			{
+				if (row < 0 || row >= Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
+				if (col < 0 || col >= Size) throw new ArgumentOutOfRangeException(nameof(col), col, "Invalid Column Index");
+				return Items[row * Size + col];
+			}
+		}
 
 		public ObservableCollection<CellViewModel> Items { get; } = new ObservableCollection<CellViewModel>();
+
+		public int Size { get; }
 
 		private void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
