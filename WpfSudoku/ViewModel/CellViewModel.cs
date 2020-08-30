@@ -5,18 +5,22 @@ namespace WpfSudoku.ViewModel
 {
 	public class CellViewModel : ViewModel, IEquatable<CellViewModel>
 	{
-		private bool _readOnly = false;
-		public bool ReadOnly
+		private bool _isReadOnly = false;
+		public bool IsReadOnly
 		{
-			get => _readOnly;
-			set => Set(ref _readOnly, value);
+			get => _isReadOnly;
+			set => Set(ref _isReadOnly, value);
 		}
 
 		private int _value = 0;
 		public int Value
 		{
 			get => _value;
-			set => Set(ref _value, value);
+			set
+			{
+				if (IsReadOnly) return;
+				Set(ref _value, value);
+			}
 		}
 
 		private bool _isValid = true;

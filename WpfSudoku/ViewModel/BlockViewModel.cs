@@ -16,8 +16,9 @@ namespace WpfSudoku.ViewModel
 				{
 					CellViewModel cell = new CellViewModel
 					{
-						Value = i * size + j
+						Value = (j*i % 10)
 					};
+					if (0 != cell.Value) cell.IsReadOnly = true;
 					cell.PropertyChanged += CellPropertyChanged;
 					Items.Add(cell);
 				}
