@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace WpfSudoku
+namespace WpfSudoku.View
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml

@@ -1,13 +1,13 @@
 ﻿using System.Windows.Controls;
 
-namespace WpfSudoku
+namespace WpfSudoku.View
 {
 	/// <summary>
 	/// Interaction logic for SudokuBoard.xaml
 	/// </summary>
-	public partial class ItemGrid : UserControl
+	public partial class Board : UserControl
 	{
-		public ItemGrid()
+		public Board()
 		{
 			InitializeComponent();
 		}

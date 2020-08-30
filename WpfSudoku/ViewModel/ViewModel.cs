@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace WpfSudoku
+namespace WpfSudoku.ViewModel
 {
 	public class ViewModel : INotifyPropertyChanged
 	{

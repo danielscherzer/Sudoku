@@ -1,15 +1,16 @@
-﻿<Window x:Class="WpfSudoku.MainWindow"
+﻿<Window x:Class="WpfSudoku.View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfSudoku"
+        xmlns:vm="clr-namespace:WpfSudoku.ViewModel"
+        xmlns:v="clr-namespace:WpfSudoku.View"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Background="{DynamicResource borderBrush}">
+        Title="MainWindow" Height="450" Width="800" Background="{DynamicResource backgroundBrush}">
 	<Window.Resources>
-		<local:GridViewModel x:Key="grid"/>
+		<vm:BoardViewModel x:Key="board"/>
 	</Window.Resources>
     <Grid>
-		<local:ItemGrid Margin="5" DataContext="{DynamicResource grid}"/>
+		<v:Board Margin="5" DataContext="{DynamicResource board}"/>
 	</Grid>
 </Window>

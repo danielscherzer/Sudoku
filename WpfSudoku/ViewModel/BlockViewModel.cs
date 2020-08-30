@@ -1,11 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace WpfSudoku
+namespace WpfSudoku.ViewModel
 {
 	public class BlockViewModel : ViewModel
 	{
-		public BlockViewModel(): this(9) { }
+		public BlockViewModel() : this(9) { }
 
 		public BlockViewModel(int size)
 		{
@@ -37,7 +37,7 @@ namespace WpfSudoku
 
 		public ObservableCollection<CellViewModel> Items { get; } = new ObservableCollection<CellViewModel>();
 
-		void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == nameof(CellViewModel.Value))
 			{

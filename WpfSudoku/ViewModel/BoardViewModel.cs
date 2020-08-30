@@ -1,13 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace WpfSudoku
+namespace WpfSudoku.ViewModel
 {
-	public class GridViewModel : ViewModel
+	public class BoardViewModel : ViewModel
 	{
-		public GridViewModel() : this(3) { }
+		public BoardViewModel() : this(3) { }
 
-		public GridViewModel(int size)
+		public BoardViewModel(int size)
 		{
 			for (int i = 0; i < size; i++)
 			{
@@ -20,11 +20,9 @@ namespace WpfSudoku
 			}
 		}
 
-		public bool IsValid { get; private set; } = true;
-
 		public ObservableCollection<BlockViewModel> Blocks { get; } = new ObservableCollection<BlockViewModel>();
 
-		void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 		}
 	}
