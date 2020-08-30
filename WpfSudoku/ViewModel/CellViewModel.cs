@@ -1,6 +1,9 @@
-﻿namespace WpfSudoku.ViewModel
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+
+namespace WpfSudoku.ViewModel
 {
-	public class CellViewModel : ViewModel
+	public class CellViewModel : ViewModel, IEquatable<CellViewModel>
 	{
 		private bool _readOnly = false;
 		public bool ReadOnly
@@ -22,5 +25,7 @@
 			get => _isValid;
 			set => Set(ref _isValid, value);
 		}
+
+		public bool Equals([AllowNull] CellViewModel other) => other?.Value == Value;
 	}
 }

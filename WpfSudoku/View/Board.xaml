@@ -13,6 +13,11 @@
 		<Style x:Key="cellBorder" TargetType="Border">
 			<Setter Property="BorderBrush" Value="{DynamicResource borderBrush}"/>
 			<Setter Property="Background" Value="{DynamicResource backgroundBrush}"/>
+			<Style.Triggers>
+				<Trigger Property ="IsMouseOver" Value="True">
+					<Setter Property= "Background" Value="{DynamicResource selectionBrush}"/>
+				</Trigger>
+			</Style.Triggers>
 		</Style>
 		<DataTemplate x:Key ="cellTemplate">
 			<TextBlock HorizontalAlignment ="Center" VerticalAlignment ="Center" FontSize="24" Foreground="{DynamicResource borderBrush}" Text ="{Binding Value}"/>
@@ -39,7 +44,7 @@
 					</ItemsControl.ItemsPanel>
 					<ItemsControl.ItemTemplate>
 						<DataTemplate>
-							<Border Style="{StaticResource cellBorder}" Width="30" Height="30" BorderThickness="0.1">
+							<Border Style="{StaticResource cellBorder}" Width="30" Height="30" BorderThickness="0.1"  MouseDown="Cell_MouseDown">
 								<ContentPresenter Content="{Binding}" Style="{StaticResource cell}"/>
 							</Border>
 						</DataTemplate>

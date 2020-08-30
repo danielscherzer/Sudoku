@@ -1,16 +1,23 @@
 ﻿<Window x:Class="WpfSudoku.View.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:WpfSudoku.ViewModel"
-        xmlns:v="clr-namespace:WpfSudoku.View"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Background="{DynamicResource backgroundBrush}">
-	<Window.Resources>
-		<vm:BoardViewModel x:Key="board"/>
-	</Window.Resources>
-    <Grid>
-		<v:Board Margin="5" DataContext="{DynamicResource board}"/>
-	</Grid>
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:v="clr-namespace:WpfSudoku.View"
+		xmlns:vm="clr-namespace:WpfSudoku.ViewModel"
+		mc:Ignorable="d"
+		Title="MainWindow" Height="450" Width="550" Background="{DynamicResource backgroundBrush}">
+	<StackPanel Orientation="Horizontal">
+		<Viewbox>
+			<ListBox x:Name="listBoxButtons" ItemsSource="{Binding Buttons}" HorizontalContentAlignment="Center" BorderBrush="Transparent" Focusable="False" SelectedIndex="0">
+				<ListBox.ItemContainerStyle>
+					<Style TargetType="ListBoxItem">
+						<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+						<Setter Property="BorderThickness" Value="0"/>
+					</Style>
+				</ListBox.ItemContainerStyle>
+			</ListBox>
+		</Viewbox>
+		<v:Board Margin="5" DataContext="{Binding Board}"/>
+	</StackPanel>
 </Window>
