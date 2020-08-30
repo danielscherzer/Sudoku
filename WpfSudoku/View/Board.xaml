@@ -11,19 +11,11 @@
 			 HorizontalAlignment ="Stretch" HorizontalContentAlignment ="Stretch" VerticalAlignment ="Stretch" VerticalContentAlignment ="Stretch">
 	<UserControl.Resources>
 		<vm:BoardViewModel x:Key="board"/>
-		<v:BooleanToFontWeightConverter x:Key="BooleanToFontWeightConverter" />
-		<Style x:Key="cellBorder" TargetType="Border">
-			<Setter Property="BorderBrush" Value="{DynamicResource borderBrush}"/>
-			<Setter Property="Background" Value="{DynamicResource backgroundBrush}"/>
-			<Style.Triggers>
-				<Trigger Property ="IsMouseOver" Value="True">
-					<Setter Property= "Background" Value="{DynamicResource selectionBrush}"/>
-				</Trigger>
-			</Style.Triggers>
-		</Style>
+
 		<!--cell style for template selection-->
 		<Style x:Key="cell" TargetType="ContentPresenter">
 			<Style.Resources>
+				<v:BooleanToFontWeightConverter x:Key="BooleanToFontWeightConverter" />
 				<DataTemplate x:Key ="emptyCellTemplate"/>
 				<DataTemplate x:Key ="cellTemplate">
 					<TextBlock HorizontalAlignment ="Center" VerticalAlignment ="Center" 
@@ -41,9 +33,25 @@
 		<!--block-->
 		<DataTemplate x:Key ="BlockTemplate">
 			<DataTemplate.Resources>
-				
+				<Style x:Key="borderStyle" TargetType="Border" >
+					<Setter Property="BorderBrush" Value="{DynamicResource borderBrush}"/>
+					<Setter Property="Background" Value="{DynamicResource backgroundBrush}"/>
+				</Style>
+				<Style x:Key="cellBorder" TargetType="Border" BasedOn="{StaticResource borderStyle}">
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding Value}" Value="6">
+							<Setter Property="Border.Background" Value="Yellow"/>
+						</DataTrigger>
+						<DataTrigger Binding="{Binding IsValid}" Value="False">
+							<Setter Property="Background" Value="red"/>
+						</DataTrigger>
+						<Trigger Property ="IsMouseOver" Value="True">
+							<Setter Property= "Background" Value="{DynamicResource selectionBrush}"/>
+						</Trigger>
+					</Style.Triggers>
+				</Style>
 			</DataTemplate.Resources>
-			<Border Style="{StaticResource cellBorder}" BorderThickness="1" Margin="-0.5">
+			<Border Style="{StaticResource borderStyle}" BorderThickness="1" Margin="-0.5">
 				<ItemsControl ItemsSource ="{Binding Items}">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>

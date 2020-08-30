@@ -31,5 +31,7 @@ namespace WpfSudoku.ViewModel
 		}
 
 		public bool Equals([AllowNull] CellViewModel other) => other?.Value == Value;
+
+		public override string ToString() => $"{Value}:{(IsReadOnly ? "R" : "")}{(IsValid ? "" : "I")}";
 	}
 }

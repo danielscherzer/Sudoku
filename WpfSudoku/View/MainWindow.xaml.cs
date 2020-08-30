@@ -17,6 +17,10 @@ namespace WpfSudoku.View
 			Board.PropertyChanged += Board_PropertyChanged;
 		}
 
+		public BoardViewModel Board { get; } = new BoardViewModel();
+
+		public IEnumerable<string> Buttons => Enumerable.Range(1, 9).Select(i => i.ToString()).Prepend("Clear");
+
 		private void Board_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			if(nameof(BoardViewModel.ActiveCell) == e.PropertyName)
@@ -25,8 +29,9 @@ namespace WpfSudoku.View
 			}
 		}
 
-		public BoardViewModel Board { get; } = new BoardViewModel();
-
-		public IEnumerable<string> Buttons => Enumerable.Range(1, 9).Select(i => i.ToString()).Prepend("Clear");
+		private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+		{
+			if (System.Windows.Input.Key.Escape == e.Key) Close();
+		}
 	}
 }

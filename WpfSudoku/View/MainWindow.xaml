@@ -4,16 +4,18 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:v="clr-namespace:WpfSudoku.View"
-		xmlns:vm="clr-namespace:WpfSudoku.ViewModel"
 		mc:Ignorable="d"
-		Title="MainWindow" Height="450" Width="550" Background="{DynamicResource backgroundBrush}">
+		Title="MainWindow" Height="450" Width="550" Background="{DynamicResource backgroundBrush}"
+		KeyDown="Window_KeyDown">
 	<StackPanel Orientation="Horizontal">
 		<Viewbox>
-			<ListBox x:Name="listBoxButtons" ItemsSource="{Binding Buttons}" HorizontalContentAlignment="Center" BorderBrush="Transparent" Focusable="False" SelectedIndex="0">
+			<ListBox x:Name="listBoxButtons" ItemsSource="{Binding Buttons}" 
+					 HorizontalContentAlignment="Center" BorderBrush="Transparent" 
+					 Focusable="false" SelectedIndex="0">
 				<ListBox.ItemContainerStyle>
 					<Style TargetType="ListBoxItem">
 						<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-						<Setter Property="BorderThickness" Value="0"/>
+						<!--<Setter Property="BorderThickness" Value="0"/>-->
 					</Style>
 				</ListBox.ItemContainerStyle>
 			</ListBox>

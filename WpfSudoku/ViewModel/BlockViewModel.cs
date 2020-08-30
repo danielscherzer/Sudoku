@@ -16,7 +16,7 @@ namespace WpfSudoku.ViewModel
 				{
 					CellViewModel cell = new CellViewModel
 					{
-						Value = (j*i % 10)
+						Value = i * size + j
 					};
 					if (0 != cell.Value) cell.IsReadOnly = true;
 					cell.PropertyChanged += CellPropertyChanged;
@@ -28,15 +28,15 @@ namespace WpfSudoku.ViewModel
 
 		public bool IsValid { get; private set; } = true;
 
-		public CellViewModel this[int row, int col]
-		{
-			get
-			{
-				if (row < 0 || row >= Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
-				if (col < 0 || col >= Size) throw new ArgumentOutOfRangeException(nameof(col), col, "Invalid Column Index");
-				return Items[row * Size + col];
-			}
-		}
+		//public CellViewModel this[int row, int col]
+		//{
+		//	get
+		//	{
+		//		if (row < 0 || row >= Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
+		//		if (col < 0 || col >= Size) throw new ArgumentOutOfRangeException(nameof(col), col, "Invalid Column Index");
+		//		return Items[row * Size + col];
+		//	}
+		//}
 
 		public ObservableCollection<CellViewModel> Items { get; } = new ObservableCollection<CellViewModel>();
 
@@ -46,28 +46,27 @@ namespace WpfSudoku.ViewModel
 		{
 			if (e.PropertyName == nameof(CellViewModel.Value))
 			{
-				bool valid = CheckIsValid();
+				var duplicate = FindDuplicate();
 
 				foreach (CellViewModel cell in Items)
 				{
-					cell.IsValid = valid;
+					cell.IsValid = cell.Value != duplicate || 0 == cell.Value;
 				}
-
-				IsValid = valid;
+				IsValid = 0 != duplicate;
 				InvokePropertyChanged(nameof(IsValid));
 			}
 		}
 
-		private bool CheckIsValid()
+		private int FindDuplicate()
 		{
-			bool[] used = new bool[Items.Count * Items.Count];
+			bool[] used = new bool[Items.Count];
 			foreach (CellViewModel c in Items)
 			{
 				if (0 != c.Value)
 				{
 					if (used[c.Value - 1])
 					{
-						return false; //this is a duplicate
+						return c.Value; //this is a duplicate
 					}
 					else
 					{
@@ -75,7 +74,7 @@ namespace WpfSudoku.ViewModel
 					}
 				}
 			}
-			return true;
+			return 0;
 		}
 	}
 }
