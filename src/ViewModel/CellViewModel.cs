@@ -1,9 +1,6 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-
-namespace WpfSudoku.ViewModel
+﻿namespace WpfSudoku.ViewModel
 {
-	public class CellViewModel : ViewModel, IEquatable<CellViewModel>
+	public class CellViewModel : ViewModel
 	{
 		private bool _isReadOnly = false;
 		public bool IsReadOnly
@@ -36,8 +33,6 @@ namespace WpfSudoku.ViewModel
 			get => _isActive;
 			set => Set(ref _isActive, value);
 		}
-
-		public bool Equals([AllowNull] CellViewModel other) => other?.Value == Value;
 
 		public override string ToString() => $"{Value}:{(IsReadOnly ? "R" : "")}{(IsValid ? "" : "I")}";
 	}

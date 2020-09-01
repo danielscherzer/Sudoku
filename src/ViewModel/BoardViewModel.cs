@@ -11,13 +11,15 @@ namespace WpfSudoku.ViewModel
 
 		public BoardViewModel(int size)
 		{
+			PropertyChanged += BoardViewModel_PropertyChanged;
 			for (int i = 0; i < size; i++)
 			{
 				for (int j = 0; j < size; j++)
 				{
-					var cell = new BlockViewModel(size);
-					cell.PropertyChanged += CellPropertyChanged;
-					Blocks.Add(cell);
+					var block = new BlockViewModel(size);
+					//block.PropertyChanged += BlockPropertyChanged;
+					foreach (var cell in block.Cells) cell.PropertyChanged += CellPropertyChanged;
+					Blocks.Add(block);
 				}
 			}
 			//cells = new CellViewModel[size, size];
@@ -37,11 +39,7 @@ namespace WpfSudoku.ViewModel
 		public int ActiveValue
 		{
 			get => _activeValue;
-			set
-			{
-				Set(ref _activeValue, value);
-				CellPropertyChanged(this, new PropertyChangedEventArgs(nameof(ActiveValue)));
-			}
+			set => Set(ref _activeValue, value);
 		}
 
 		public CellViewModel this[int row, int col]
@@ -60,7 +58,6 @@ namespace WpfSudoku.ViewModel
 
 		//private CellViewModel[,] cells;
 
-
 		private BlockViewModel GetBlock(int row, int col)
 		{
 			if (row < 0 || row >= Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
@@ -68,9 +65,16 @@ namespace WpfSudoku.ViewModel
 			return Blocks[row * Size + col];
 		}
 
+		private void BoardViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (nameof(ActiveValue) == e.PropertyName) UpdateCellActive();
+		}
+
+		private void UpdateCellActive() => ForEachCell(cell => cell.IsActive = ActiveValue == cell.Value && cell.Value != 0);
+
 		private void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			ForEachCell(cell => cell.IsActive = ActiveValue == cell.Value && cell.Value != 0);
+			if (nameof(CellViewModel.Value) == e.PropertyName) UpdateCellActive();
 		}
 
 		private void FillBoard()
@@ -90,18 +94,6 @@ namespace WpfSudoku.ViewModel
 					}
 				}
 			}
-			//foreach(var block in Blocks)
-			//{
-			//	foreach(var cell in block.Cells)
-			//	{
-			//		if(0 == position % 4)
-			//		{
-			//			cell.Value = rnd.Next(10);
-			//			if (0 != cell.Value) cell.IsReadOnly = true;
-			//		}
-			//		++position;
-			//	}
-			//}
 		}
 
 		private void ForEachCell(Action<CellViewModel> action)
