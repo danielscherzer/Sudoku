@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Input;
 using WpfSudoku.ViewModel;
 
 namespace WpfSudoku.View
@@ -13,11 +14,18 @@ namespace WpfSudoku.View
 			InitializeComponent();
 		}
 
-		private void Cell_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		private void Cell_MouseDown(object sender, MouseButtonEventArgs e)
 		{
 			var element = sender as Border;
 			var cell = element?.DataContext as CellViewModel;
-			if (DataContext is BoardViewModel board) board.ActiveCell = cell;
+			if (DataContext is BoardViewModel board)
+			{
+				board.ActiveCell = cell;
+				if (MouseButton.Right == e.ChangedButton && cell != null)
+				{
+					cell.Value = 0;
+				}
+			}
 		}
 	}
 }

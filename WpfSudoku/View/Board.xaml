@@ -11,7 +11,6 @@
 			 HorizontalAlignment ="Stretch" HorizontalContentAlignment ="Stretch" VerticalAlignment ="Stretch" VerticalContentAlignment ="Stretch">
 	<UserControl.Resources>
 		<vm:BoardViewModel x:Key="board"/>
-
 		<!--cell style for template selection-->
 		<Style x:Key="cell" TargetType="ContentPresenter">
 			<Style.Resources>
@@ -39,9 +38,9 @@
 				</Style>
 				<Style x:Key="cellBorder" TargetType="Border" BasedOn="{StaticResource borderStyle}">
 					<Style.Triggers>
-						<DataTrigger Binding="{Binding Value}" Value="6">
+						<!--<DataTrigger Binding="{Binding Value}" Value="6">
 							<Setter Property="Border.Background" Value="Yellow"/>
-						</DataTrigger>
+						</DataTrigger>-->
 						<DataTrigger Binding="{Binding IsValid}" Value="False">
 							<Setter Property="Background" Value="red"/>
 						</DataTrigger>
@@ -52,7 +51,7 @@
 				</Style>
 			</DataTemplate.Resources>
 			<Border Style="{StaticResource borderStyle}" BorderThickness="1" Margin="-0.5">
-				<ItemsControl ItemsSource ="{Binding Items}">
+				<ItemsControl ItemsSource ="{Binding Cells}">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
 							<UniformGrid Background="{DynamicResource borderBrush}"/>

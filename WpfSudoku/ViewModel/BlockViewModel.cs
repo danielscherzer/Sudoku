@@ -10,35 +10,28 @@ namespace WpfSudoku.ViewModel
 
 		public BlockViewModel(int size)
 		{
-			for (int i = 0; i < size; i++)
+			for (int i = 0; i < size * size; i++)
 			{
-				for (int j = 0; j < size; j++)
-				{
-					CellViewModel cell = new CellViewModel
-					{
-						Value = i * size + j
-					};
-					if (0 != cell.Value) cell.IsReadOnly = true;
-					cell.PropertyChanged += CellPropertyChanged;
-					Items.Add(cell);
-				}
+				CellViewModel cell = new CellViewModel();
+				cell.PropertyChanged += CellPropertyChanged;
+				Cells.Add(cell);
 			}
 			Size = size;
 		}
 
 		public bool IsValid { get; private set; } = true;
 
-		//public CellViewModel this[int row, int col]
-		//{
-		//	get
-		//	{
-		//		if (row < 0 || row >= Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
-		//		if (col < 0 || col >= Size) throw new ArgumentOutOfRangeException(nameof(col), col, "Invalid Column Index");
-		//		return Items[row * Size + col];
-		//	}
-		//}
+		public CellViewModel this[int row, int col]
+		{
+			get
+			{
+				if (row < 0 || row >= Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
+				if (col < 0 || col >= Size) throw new ArgumentOutOfRangeException(nameof(col), col, "Invalid Column Index");
+				return Cells[row * Size + col];
+			}
+		}
 
-		public ObservableCollection<CellViewModel> Items { get; } = new ObservableCollection<CellViewModel>();
+		public ObservableCollection<CellViewModel> Cells { get; } = new ObservableCollection<CellViewModel>();
 
 		public int Size { get; }
 
@@ -48,7 +41,7 @@ namespace WpfSudoku.ViewModel
 			{
 				var duplicate = FindDuplicate();
 
-				foreach (CellViewModel cell in Items)
+				foreach (CellViewModel cell in Cells)
 				{
 					cell.IsValid = cell.Value != duplicate || 0 == cell.Value;
 				}
@@ -59,8 +52,8 @@ namespace WpfSudoku.ViewModel
 
 		private int FindDuplicate()
 		{
-			bool[] used = new bool[Items.Count];
-			foreach (CellViewModel c in Items)
+			bool[] used = new bool[Cells.Count];
+			foreach (CellViewModel c in Cells)
 			{
 				if (0 != c.Value)
 				{
