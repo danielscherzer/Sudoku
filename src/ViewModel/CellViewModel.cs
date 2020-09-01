@@ -30,6 +30,13 @@ namespace WpfSudoku.ViewModel
 			set => Set(ref _isValid, value);
 		}
 
+		private bool _isActive = false;
+		public bool IsActive
+		{
+			get => _isActive;
+			set => Set(ref _isActive, value);
+		}
+
 		public bool Equals([AllowNull] CellViewModel other) => other?.Value == Value;
 
 		public override string ToString() => $"{Value}:{(IsReadOnly ? "R" : "")}{(IsValid ? "" : "I")}";

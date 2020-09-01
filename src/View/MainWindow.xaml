@@ -11,7 +11,7 @@
 		<Viewbox>
 			<ListBox x:Name="listBoxButtons" ItemsSource="{Binding Buttons}" 
 					 HorizontalContentAlignment="Center" BorderBrush="Transparent" 
-					 Focusable="false" SelectedIndex="0">
+					 Focusable="false" SelectedIndex="{Binding Board.ActiveValue}">
 				<ListBox.ItemContainerStyle>
 					<Style TargetType="ListBoxItem">
 						<Setter Property="FocusVisualStyle" Value="{x:Null}"/>

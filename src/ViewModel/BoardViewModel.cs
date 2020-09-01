@@ -33,6 +33,17 @@ namespace WpfSudoku.ViewModel
 			set => Set(ref _activeCell, value);
 		}
 
+		private int _activeValue;
+		public int ActiveValue
+		{
+			get => _activeValue;
+			set
+			{
+				Set(ref _activeValue, value);
+				CellPropertyChanged(this, new PropertyChangedEventArgs(nameof(ActiveValue)));
+			}
+		}
+
 		public CellViewModel this[int row, int col]
 		{
 			get
@@ -59,6 +70,7 @@ namespace WpfSudoku.ViewModel
 
 		private void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
+			ForEachCell(cell => cell.IsActive = ActiveValue == cell.Value && cell.Value != 0);
 		}
 
 		private void FillBoard()
@@ -90,6 +102,17 @@ namespace WpfSudoku.ViewModel
 			//		++position;
 			//	}
 			//}
+		}
+
+		private void ForEachCell(Action<CellViewModel> action)
+		{
+			foreach (var block in Blocks)
+			{
+				foreach (var cell in block.Cells)
+				{
+					action(cell);
+				}
+			}
 		}
 	}
 }
