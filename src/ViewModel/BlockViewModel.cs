@@ -50,7 +50,7 @@ namespace WpfSudoku.ViewModel
 			}
 		}
 
-		private int FindDuplicate()
+		private uint FindDuplicate()
 		{
 			bool[] used = new bool[Cells.Count];
 			foreach (CellViewModel c in Cells)

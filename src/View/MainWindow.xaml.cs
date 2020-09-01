@@ -25,7 +25,7 @@ namespace WpfSudoku.View
 		{
 			if(nameof(BoardViewModel.ActiveCell) == e.PropertyName)
 			{
-				if(Board.ActiveCell != null) Board.ActiveCell.Value = listBoxButtons.SelectedIndex;
+				if(Board.ActiveCell != null) Board.ActiveCell.Value = (uint)listBoxButtons.SelectedIndex;
 			}
 		}
 
