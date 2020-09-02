@@ -54,6 +54,14 @@ namespace WpfSudoku.ViewModel
 		}
 
 		public ObservableCollection<BlockViewModel> Blocks { get; } = new ObservableCollection<BlockViewModel>();
+
+		private bool _isWon = false;
+		public bool IsWon
+		{
+			get => _isWon;
+			set => Set(ref _isWon, value);
+		}
+
 		public int Size { get; }
 
 		//private CellViewModel[,] cells;
@@ -74,7 +82,18 @@ namespace WpfSudoku.ViewModel
 
 		private void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			if (nameof(CellViewModel.Value) == e.PropertyName) UpdateCellActive();
+			if (nameof(CellViewModel.Value) == e.PropertyName)
+			{
+				UpdateCellActive();
+				CheckWon();
+			}
+		}
+
+		private void CheckWon()
+		{
+			var won = true;
+			ForEachCell(cell => won &= cell.IsValid && 0 != cell.Value);
+			IsWon = won;
 		}
 
 		private void FillBoard()
@@ -86,7 +105,7 @@ namespace WpfSudoku.ViewModel
 			{
 				for (byte x = 0; x < ss; ++x)
 				{
-					if (rnd.NextDouble() > 0.2)
+					if (rnd.NextDouble() > 0.3)
 					{
 						var cell = this[x, y];
 						cell.Value = field[x, y];

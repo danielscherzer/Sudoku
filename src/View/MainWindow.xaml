@@ -7,19 +7,39 @@
 		mc:Ignorable="d"
 		Title="MainWindow" Height="450" Width="550" Background="{DynamicResource backgroundBrush}"
 		KeyDown="Window_KeyDown">
-	<StackPanel Orientation="Horizontal">
-		<Viewbox>
-			<ListBox x:Name="listBoxButtons" ItemsSource="{Binding Buttons}" 
+	<Grid>
+		<StackPanel Orientation="Horizontal">
+			<Viewbox>
+				<ListBox x:Name="listBoxButtons" ItemsSource="{Binding Buttons}" 
 					 HorizontalContentAlignment="Center" BorderBrush="Transparent" 
 					 Focusable="false" SelectedIndex="{Binding Board.ActiveValue}">
-				<ListBox.ItemContainerStyle>
-					<Style TargetType="ListBoxItem">
-						<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-						<!--<Setter Property="BorderThickness" Value="0"/>-->
+					<ListBox.ItemContainerStyle>
+						<Style TargetType="ListBoxItem">
+							<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+							<!--<Setter Property="BorderThickness" Value="0"/>-->
+						</Style>
+					</ListBox.ItemContainerStyle>
+				</ListBox>
+			</Viewbox>
+			<v:Board Margin="5" DataContext="{Binding Board}"/>
+		</StackPanel>
+		<!--won screen-->
+		<Viewbox Grid.Row="1">
+			<TextBlock Name="won" Background="Purple" Foreground="DeepPink" TextWrapping="Wrap" TextAlignment="Center">
+				<TextBlock.Style>
+					<Style TargetType="TextBlock">
+						<Setter Property="Visibility" Value="Hidden"/>
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding Board.IsWon}" Value="true">
+								<Setter Property="Visibility" Value="Visible"/>
+							</DataTrigger>
+						</Style.Triggers>
 					</Style>
-				</ListBox.ItemContainerStyle>
-			</ListBox>
+				</TextBlock.Style>
+				<Bold>
+					YOU WON!!!
+				</Bold>
+			</TextBlock>
 		</Viewbox>
-		<v:Board Margin="5" DataContext="{Binding Board}"/>
-	</StackPanel>
+	</Grid>
 </Window>
