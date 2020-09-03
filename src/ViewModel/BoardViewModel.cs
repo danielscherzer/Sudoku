@@ -23,7 +23,7 @@ namespace WpfSudoku.ViewModel
 				}
 			}
 			Size = size;
-			FillBoard();
+			Fill();
 		}
 
 		private CellViewModel? _activeCell;
@@ -61,6 +61,26 @@ namespace WpfSudoku.ViewModel
 		}
 
 		public int Size { get; }
+
+		public void Fill()
+		{
+			var rnd = new Random();
+			var field = SudokuCreator.Find();
+			var ss = Size * Size;
+			for (byte y = 0; y < ss; ++y)
+			{
+				for (byte x = 0; x < ss; ++x)
+				{
+					var cell = this[x, y];
+					cell.Reset();
+					if (rnd.NextDouble() > 0.3)
+					{
+						cell.Value = (uint)field[x, y];
+						cell.IsReadOnly = true;
+					}
+				}
+			}
+		}
 
 		private BlockViewModel GetBlock(int row, int col)
 		{
@@ -124,25 +144,6 @@ namespace WpfSudoku.ViewModel
 			var won = true;
 			ForEachCell(cell => won &= cell.IsValid && 0 != cell.Value);
 			IsWon = won;
-		}
-
-		private void FillBoard()
-		{
-			var rnd = new Random();
-			var field = SudokuCreator.Find();
-			var ss = Size * Size;
-			for (byte y = 0; y < ss; ++y)
-			{
-				for (byte x = 0; x < ss; ++x)
-				{
-					if (rnd.NextDouble() > 0.3)
-					{
-						var cell = this[x, y];
-						cell.Value = (uint)field[x, y];
-						cell.IsReadOnly = true;
-					}
-				}
-			}
 		}
 
 		private void ForEachCell(Action<CellViewModel> action)

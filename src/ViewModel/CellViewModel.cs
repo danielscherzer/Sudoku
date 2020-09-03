@@ -24,11 +24,25 @@
 			}
 		}
 
+		private bool _isActive = false;
+		public bool IsActive
+		{
+			get => _isActive;
+			set => Set(ref _isActive, value);
+		}
+
 		private bool _isReadOnly = false;
 		public bool IsReadOnly
 		{
 			get => _isReadOnly;
 			set => Set(ref _isReadOnly, value);
+		}
+
+		private bool _isValid = true;
+		public bool IsValid
+		{
+			get => _isValid;
+			set => Set(ref _isValid, value);
 		}
 
 		private uint _value = 0;
@@ -42,18 +56,13 @@
 			}
 		}
 
-		private bool _isValid = true;
-		public bool IsValid
+		internal void Reset()
 		{
-			get => _isValid;
-			set => Set(ref _isValid, value);
-		}
-
-		private bool _isActive = false;
-		public bool IsActive
-		{
-			get => _isActive;
-			set => Set(ref _isActive, value);
+			IsActive = false;
+			IsReadOnly = false;
+			IsValid = true;
+			Value = 0;
+			//_value = toBit[10];
 		}
 
 		public override string ToString() => $"{Value}:{(IsReadOnly ? "R" : "")}{(IsValid ? "" : "I")}";

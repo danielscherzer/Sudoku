@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace WpfSudoku.Model
@@ -28,6 +29,7 @@ namespace WpfSudoku.Model
 
 		public static int[,] Find()
 		{
+			var timer = Stopwatch.StartNew();
 			var random = rnd.Value;
 			if (random is null)
 			{
@@ -42,6 +44,7 @@ namespace WpfSudoku.Model
 				valid = ValidityChecks.All(field);
 				counter++;
 			} while (!valid);
+			Console.WriteLine($"Try= {counter} in {timer.ElapsedMilliseconds}ms; {counter / Math.Max(1, timer.ElapsedMilliseconds)}try/msec");
 			return field;
 		}
 
@@ -55,7 +58,7 @@ namespace WpfSudoku.Model
 				value++;
 				b = value;
 			}
-			field.ForEach(process, () => value += 3 + rnd.Next());
+			field.ForEach(process, () => value += 3 + rnd.Next(10));
 			return field;
 		}
 
