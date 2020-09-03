@@ -1,7 +1,7 @@
-﻿using Sudoku;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using WpfSudoku.Model;
 
 namespace WpfSudoku.ViewModel
 {
@@ -22,8 +22,6 @@ namespace WpfSudoku.ViewModel
 					Blocks.Add(block);
 				}
 			}
-			//cells = new CellViewModel[size, size];
-
 			Size = size;
 			FillBoard();
 		}
@@ -35,14 +33,14 @@ namespace WpfSudoku.ViewModel
 			set => Set(ref _activeCell, value);
 		}
 
-		private int _activeValue;
-		public int ActiveValue
+		private uint _activeValue;
+		public uint ActiveValue
 		{
 			get => _activeValue;
 			set => Set(ref _activeValue, value);
 		}
 
-		public CellViewModel this[int row, int col]
+		private CellViewModel this[int row, int col]
 		{
 			get
 			{
@@ -64,8 +62,6 @@ namespace WpfSudoku.ViewModel
 
 		public int Size { get; }
 
-		//private CellViewModel[,] cells;
-
 		private BlockViewModel GetBlock(int row, int col)
 		{
 			if (row < 0 || row >= Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
@@ -75,22 +71,56 @@ namespace WpfSudoku.ViewModel
 
 		private void BoardViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			if (nameof(ActiveValue) == e.PropertyName) UpdateCellActive();
+			switch(e.PropertyName)
+			{
+				case nameof(ActiveValue): ActiveValueChanged(); break;
+				case nameof(ActiveCell): ActiveCellChanged(); break;
+			}
 		}
 
-		private void UpdateCellActive() => ForEachCell(cell => cell.IsActive = ActiveValue == cell.Value && cell.Value != 0);
+		private void ActiveCellChanged()
+		{
+			if (ActiveCell is null) return;
+
+			if (!ActiveCell.IsReadOnly)
+			{
+				ActiveCell.Value = ActiveValue;
+			}
+			else
+			{
+				if (0 == ActiveCell.Value) return;
+				ActiveValue = ActiveCell.Value;
+			}
+		}
+
+		private void ActiveValueChanged() => ForEachCell(cell => cell.IsActive = ActiveValue == cell.Value && cell.Value != 0);
 
 		private void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (nameof(CellViewModel.Value) == e.PropertyName)
 			{
-				UpdateCellActive();
-				CheckWon();
+				ActiveValueChanged();
+				CheckValid();
 			}
 		}
 
-		private void CheckWon()
+		private void CheckValid()
 		{
+			// convert
+			var field = new int[9, 9];
+			for (int x = 0; x < 9; ++x)
+			{
+				for (int y = 0; y < 9; ++y)
+				{
+					field[y, x] = (int)this[x, y].Value;
+					this[x, y].IsValid = true;
+				}
+			}
+			foreach((var x, var y) in ValidityChecks.EnumerateAllInvalidCells(field))
+			{
+				this[y, x].IsValid = false;
+			}
+			// is won?
 			var won = true;
 			ForEachCell(cell => won &= cell.IsValid && 0 != cell.Value);
 			IsWon = won;
@@ -108,7 +138,7 @@ namespace WpfSudoku.ViewModel
 					if (rnd.NextDouble() > 0.3)
 					{
 						var cell = this[x, y];
-						cell.Value = field[x, y];
+						cell.Value = (uint)field[x, y];
 						cell.IsReadOnly = true;
 					}
 				}

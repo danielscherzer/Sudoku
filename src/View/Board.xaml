@@ -79,15 +79,15 @@
 				</Style>
 				<Style x:Key="cellBorder" TargetType="Border" BasedOn="{StaticResource borderStyle}">
 					<Style.Triggers>
+						<Trigger Property ="IsMouseOver" Value="True">
+							<Setter Property= "Background" Value="{DynamicResource selectionBrush}"/>
+						</Trigger>
 						<DataTrigger Binding="{Binding IsActive}" Value="true">
 							<Setter Property="Border.Background" Value="Yellow"/>
 						</DataTrigger>
 						<DataTrigger Binding="{Binding IsValid}" Value="False">
 							<Setter Property="Background" Value="red"/>
 						</DataTrigger>
-						<Trigger Property ="IsMouseOver" Value="True">
-							<Setter Property= "Background" Value="{DynamicResource selectionBrush}"/>
-						</Trigger>
 					</Style.Triggers>
 				</Style>
 			</DataTemplate.Resources>

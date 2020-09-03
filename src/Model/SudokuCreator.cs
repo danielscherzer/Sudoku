@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 
-namespace Sudoku
+namespace WpfSudoku.Model
 {
 	class SudokuCreator
 	{
@@ -13,7 +12,7 @@ namespace Sudoku
 
 		public static void TryMany()
 		{
-			for(int i = 0; i < Environment.ProcessorCount; ++i)
+			for (int i = 0; i < Environment.ProcessorCount; ++i)
 			{
 				ThreadPool.QueueUserWorkItem(ThreadProcMany);
 			}
@@ -27,15 +26,14 @@ namespace Sudoku
 			}
 		}
 
-		public static byte[,] Find()
+		public static int[,] Find()
 		{
-			var timer = Stopwatch.StartNew();
 			var random = rnd.Value;
 			if (random is null)
 			{
-				return new byte[9, 9];
+				return new int[9, 9];
 			}
-			byte[,] field;
+			int[,] field;
 			bool valid;
 			int counter = 0;
 			do
@@ -44,34 +42,31 @@ namespace Sudoku
 				valid = ValidityChecks.All(field);
 				counter++;
 			} while (!valid);
-			field.Print();
-			Console.WriteLine($"Try= {counter} in {timer.ElapsedMilliseconds}ms; {counter / timer.ElapsedMilliseconds}try/msec");
-			//Console.ReadKey();
 			return field;
 		}
 
-		private static byte[,] Create(Random rnd)
+		private static int[,] Create(Random rnd)
 		{
-			var field = new byte[9, 9];
-			byte value = 0;
-			void process(ref byte b)
+			var field = new int[9, 9];
+			int value = 0;
+			void process(ref int b)
 			{
 				value %= 9;
 				value++;
 				b = value;
 			}
-			field.ForEach(process, () => value += (byte)(3 + rnd.Next()));
+			field.ForEach(process, () => value += 3 + rnd.Next());
 			return field;
 		}
 
-		private static byte[,] Create2(Random rnd)
+		private static int[,] Create2(Random rnd)
 		{
-			var field = new byte[9, 9];
-			byte[] shuffledLine = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-			for (byte y = 0; y < 9; ++y)
+			var field = new int[9, 9];
+			int[] shuffledLine = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+			for (int y = 0; y < 9; ++y)
 			{
 				Shuffle(shuffledLine, rnd);
-				for (byte x = 0; x < 9; ++x)
+				for (int x = 0; x < 9; ++x)
 				{
 					field[x, y] = shuffledLine[x];
 				}
@@ -79,27 +74,27 @@ namespace Sudoku
 			return field;
 		}
 
-		private static byte[,] Create3(Random rnd)
+		private static int[,] Create3(Random rnd)
 		{
-			var possibleFields = new HashSet<byte>[9, 9];
-			byte[] fullSet = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-			possibleFields.ForEach((ref HashSet<byte> e) => e = new HashSet<byte>(fullSet));
-			for (byte y = 0; y < 9; ++y)
+			var possibleFields = new HashSet<int>[9, 9];
+			int[] fullSet = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+			possibleFields.ForEach((ref HashSet<int> e) => e = new HashSet<int>(fullSet));
+			for (int y = 0; y < 9; ++y)
 			{
 				Shuffle(fullSet, rnd);
-				for (byte x = 0; x < 9; ++x)
+				for (int x = 0; x < 9; ++x)
 				{
 					Update(possibleFields, x, y, fullSet[x]);
 				}
 			}
-			return new byte[9, 9];
+			return new int[9, 9];
 		}
 
-		private static void Update(HashSet<byte>[,] possibleFields, byte x, byte y, byte value)
+		private static void Update(HashSet<int>[,] possibleFields, int x, int y, int value)
 		{
-			possibleFields[x, y] = new HashSet<byte>() { value };
+			possibleFields[x, y] = new HashSet<int>() { value };
 			// update row
-			for (byte column = 0; column < 9; ++column)
+			for (int column = 0; column < 9; ++column)
 			{
 				if (x != column)
 				{
@@ -107,7 +102,7 @@ namespace Sudoku
 				}
 			}
 			// update column
-			for (byte row = 0; row < 9; ++row)
+			for (int row = 0; row < 9; ++row)
 			{
 				if (y != row)
 				{
@@ -115,8 +110,8 @@ namespace Sudoku
 				}
 			}
 			// update box
-			var u0 = (x % 3) * 3;
-			var v0 = (y % 3) * 3;
+			var u0 = x % 3 * 3;
+			var v0 = y % 3 * 3;
 			for (int u = u0; u < 3 + u0; ++u)
 			{
 				for (int v = v0; v < 3 + v0; ++v)
@@ -129,7 +124,7 @@ namespace Sudoku
 			}
 		}
 
-		private static void Shuffle(byte[] numbers, Random rnd)
+		private static void Shuffle(int[] numbers, Random rnd)
 		{
 			for (int i = numbers.Length - 1; i > 0; i--)
 			{

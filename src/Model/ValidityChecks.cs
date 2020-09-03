@@ -1,79 +1,83 @@
-﻿namespace Sudoku
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace WpfSudoku.Model
 {
 	internal class ValidityChecks
 	{
-		internal static bool All(byte[,] field)
+		internal static IEnumerable<(int, int)> EnumerateAllInvalidCells(int[,] board)
 		{
-			return Boxes(field) && Columns(field) && Rows(field);
+			foreach (var cell in EnumerateAllInvalidCellsBoxes(board)) yield return cell;
+			foreach (var cell in EnumerateAllInvalidCellsColumns(board)) yield return cell;
+			foreach (var cell in EnumerateAllInvalidCellsRows(board)) yield return cell;
 		}
 
-		internal static bool Boxes(byte[,] field)
+		private static IEnumerable<(int, int)> EnumerateAllInvalidCellsBoxes(int[,] board)
 		{
-			var used = new bool[9];
 			for (int b0 = 0; b0 < 3; ++b0)
 			{
 				for (int b1 = 0; b1 < 3; ++b1)
 				{
+					var used = new bool[9];
 					for (int x = b0 * 3; x < 3 + b0 * 3; ++x)
 					{
 						for (int y = b1 * 3; y < 3 + b1 * 3; ++y)
 						{
-							var value = field[x, y];
+							var value = board[x, y];
 							if (0 == value) continue;
 							if (used[value - 1])
 							{
-								//Debug.WriteLine($"box {b0}x{b1} multiple element {value}");
-								return false;
+								yield return (x, y);
 							}
 							used[value - 1] = true;
 						}
 					}
-					used = new bool[9];
 				}
 			}
-			return true;
 		}
 
-		internal static bool Columns(byte[,] field)
+		private static IEnumerable<(int, int)> EnumerateAllInvalidCellsColumns(int[,] board)
 		{
-			var used = new bool[9];
-			for (byte x = 0; x < 9; ++x)
+			for (int x = 0; x < 9; ++x)
 			{
-				for (byte y = 0; y < 9; ++y)
+				var used = new bool[9];
+				for (int y = 0; y < 9; ++y)
 				{
-					var value = field[x, y];
+					var value = board[x, y];
 					if (0 == value) continue;
 					if (used[value - 1])
 					{
-						//Debug.WriteLine($"column {x + 1} multiple element {value}");
-						return false;
+						yield return (x, y);
 					}
 					used[value - 1] = true;
 				}
-				used = new bool[9];
 			}
-			return true;
 		}
 
-		internal static bool Rows(byte[,] field)
+		private static IEnumerable<(int, int)> EnumerateAllInvalidCellsRows(int[,] board)
 		{
-			var used = new bool[9];
-			for (byte y = 0; y < 9; ++y)
+			for (int y = 0; y < 9; ++y)
 			{
-				for (byte x = 0; x < 9; ++x)
+				var used = new bool[9];
+				for (int x = 0; x < 9; ++x)
 				{
-					var value = field[x, y];
+					var value = board[x, y];
 					if (0 == value) continue;
-					if(used[value - 1])
+					if (used[value - 1])
 					{
-						//Debug.WriteLine($"row {y + 1} multiple element {value}");
-						return false;
+						yield return (x, y);
 					}
 					used[value - 1] = true;
 				}
-				used = new bool[9];
 			}
-			return true;
 		}
+
+		internal static bool All(int[,] board) => Boxes(board) && Columns(board) && Rows(board);
+
+		internal static bool Boxes(int[,] board) => !EnumerateAllInvalidCellsBoxes(board).Any();
+
+		internal static bool Columns(int[,] board) => !EnumerateAllInvalidCellsColumns(board).Any();
+
+		internal static bool Rows(int[,] board) => !EnumerateAllInvalidCellsRows(board).Any();
 	}
 }

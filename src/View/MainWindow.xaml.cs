@@ -14,20 +14,11 @@ namespace WpfSudoku.View
 		{
 			InitializeComponent();
 			DataContext = this;
-			Board.PropertyChanged += Board_PropertyChanged;
 		}
 
 		public BoardViewModel Board { get; } = new BoardViewModel();
 
 		public IEnumerable<string> Buttons => Enumerable.Range(1, 9).Select(i => i.ToString()).Prepend("Clear");
-
-		private void Board_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			if(nameof(BoardViewModel.ActiveCell) == e.PropertyName)
-			{
-				if(Board.ActiveCell != null) Board.ActiveCell.Value = (uint)listBoxButtons.SelectedIndex;
-			}
-		}
 
 		private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
 		{
