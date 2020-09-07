@@ -5,42 +5,43 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:v="clr-namespace:WpfSudoku.View"
 		mc:Ignorable="d"
-		Title="MainWindow" Height="450" Width="550" Background="{DynamicResource backgroundBrush}"
+		Title="MainWindow" Height="450" Width="650" Background="{DynamicResource backgroundBrush}"
 		KeyDown="Window_KeyDown">
 	<Grid>
 		<StackPanel Orientation="Horizontal">
 			<Viewbox>
-				<ListBox x:Name="listBoxButtons" ItemsSource="{Binding Buttons}" 
-					 HorizontalContentAlignment="Center" BorderBrush="Transparent" 
-					 Focusable="false" SelectedIndex="{Binding Board.ActiveValue}">
-					<ListBox.ItemContainerStyle>
-						<Style TargetType="ListBoxItem">
-							<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-							<!--<Setter Property="BorderThickness" Value="0"/>-->
-						</Style>
-					</ListBox.ItemContainerStyle>
-				</ListBox>
+				<Grid>
+					<ListBox x:Name="listBoxButtons" ItemsSource="{Binding Buttons}" 
+						 HorizontalContentAlignment="Center" BorderBrush="Transparent" 
+						 Focusable="false" SelectedIndex="{Binding Board.ActiveValue}">
+						<ListBox.ItemContainerStyle>
+							<Style TargetType="ListBoxItem">
+								<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+							</Style>
+						</ListBox.ItemContainerStyle>
+					</ListBox>
+					<!--won screen-->
+					<Viewbox>
+						<TextBlock Name="won" Background="Purple" Foreground="DeepPink" TextWrapping="Wrap" TextAlignment="Center">
+							<TextBlock.Style>
+								<Style TargetType="TextBlock">
+									<Setter Property="Visibility" Value="Hidden"/>
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding Board.IsWon}" Value="true">
+											<Setter Property="Visibility" Value="Visible"/>
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</TextBlock.Style>
+							<Bold>
+								YOU WON
+							</Bold>
+						</TextBlock>
+					</Viewbox>
+				</Grid>
 			</Viewbox>
 			<v:Board Margin="5" DataContext="{Binding Board}"/>
 			<Button Click="Button_Click">New</Button>
 		</StackPanel>
-		<!--won screen-->
-		<Viewbox Grid.Row="1">
-			<TextBlock Name="won" Background="Purple" Foreground="DeepPink" TextWrapping="Wrap" TextAlignment="Center">
-				<TextBlock.Style>
-					<Style TargetType="TextBlock">
-						<Setter Property="Visibility" Value="Hidden"/>
-						<Style.Triggers>
-							<DataTrigger Binding="{Binding Board.IsWon}" Value="true">
-								<Setter Property="Visibility" Value="Visible"/>
-							</DataTrigger>
-						</Style.Triggers>
-					</Style>
-				</TextBlock.Style>
-				<Bold>
-					YOU WON!!!
-				</Bold>
-			</TextBlock>
-		</Viewbox>
 	</Grid>
 </Window>

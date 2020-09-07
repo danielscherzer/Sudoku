@@ -31,7 +31,7 @@ namespace WpfSudoku.View
 			var cell = element?.DataContext as CellViewModel;
 			if (DataContext is BoardViewModel board)
 			{
-				board.ActiveCell = cell;
+				board.CurrentCell = cell;
 				if (MouseButton.Right == e.ChangedButton && cell != null)
 				{
 					cell.Value = 0;

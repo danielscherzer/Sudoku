@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace WpfSudoku.Model
 {
@@ -16,6 +17,14 @@ namespace WpfSudoku.Model
 				}
 				newRow?.Invoke();
 			}
+		}
+
+		internal static void Log(string msg)
+		{
+#if DEBUG
+			Console.Write(msg);
+			File.AppendAllText(@"d:\bench.log", msg);
+#endif
 		}
 	}
 }

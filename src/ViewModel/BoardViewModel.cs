@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using WpfSudoku.Model;
 
 namespace WpfSudoku.ViewModel
@@ -17,20 +18,19 @@ namespace WpfSudoku.ViewModel
 				for (int j = 0; j < size; j++)
 				{
 					var block = new BlockViewModel(size);
-					//block.PropertyChanged += BlockPropertyChanged;
 					foreach (var cell in block.Cells) cell.PropertyChanged += CellPropertyChanged;
 					Blocks.Add(block);
 				}
 			}
 			Size = size;
-			Fill();
+			_ = FillAsync();
 		}
 
-		private CellViewModel? _activeCell;
-		public CellViewModel? ActiveCell
+		private CellViewModel? _currentCell;
+		public CellViewModel? CurrentCell
 		{
-			get => _activeCell;
-			set => Set(ref _activeCell, value);
+			get => _currentCell;
+			set => Set(ref _currentCell, value);
 		}
 
 		private uint _activeValue;
@@ -62,20 +62,26 @@ namespace WpfSudoku.ViewModel
 
 		public int Size { get; }
 
-		public void Fill()
+		public async Task FillAsync()
 		{
-			var rnd = new Random();
-			var field = SudokuCreator.Find();
+			var field = await SudokuCreator.FindAsync();
+			SudokuCreator.RemoveSome(field, 0.3);
+			ConvertField(field);
+		}
+
+		private void ConvertField(int[,] field)
+		{
 			var ss = Size * Size;
-			for (byte y = 0; y < ss; ++y)
+			for (int y = 0; y < ss; ++y)
 			{
-				for (byte x = 0; x < ss; ++x)
+				for (int x = 0; x < ss; ++x)
 				{
-					var cell = this[x, y];
+					var cell = this[y, x];
 					cell.Reset();
-					if (rnd.NextDouble() > 0.3)
+					var value = field[x, y];
+					if (0 != value)
 					{
-						cell.Value = (uint)field[x, y];
+						cell.Value = (uint)value;
 						cell.IsReadOnly = true;
 					}
 				}
@@ -94,22 +100,22 @@ namespace WpfSudoku.ViewModel
 			switch(e.PropertyName)
 			{
 				case nameof(ActiveValue): ActiveValueChanged(); break;
-				case nameof(ActiveCell): ActiveCellChanged(); break;
+				case nameof(CurrentCell): ActiveCellChanged(); break;
 			}
 		}
 
 		private void ActiveCellChanged()
 		{
-			if (ActiveCell is null) return;
+			if (CurrentCell is null) return;
 
-			if (!ActiveCell.IsReadOnly)
+			if (CurrentCell.IsReadOnly)
 			{
-				ActiveCell.Value = ActiveValue;
+				if (0 == CurrentCell.Value) return;
+				ActiveValue = CurrentCell.Value;
 			}
 			else
 			{
-				if (0 == ActiveCell.Value) return;
-				ActiveValue = ActiveCell.Value;
+				CurrentCell.Value = ActiveValue;
 			}
 		}
 
@@ -120,7 +126,26 @@ namespace WpfSudoku.ViewModel
 			if (nameof(CellViewModel.Value) == e.PropertyName)
 			{
 				ActiveValueChanged();
+				RemoveFromPossibleValues();
 				CheckValid();
+			}
+		}
+
+		private void RemoveFromPossibleValues()
+		{
+			for (int y = 0; y < 9; ++y)
+			{
+				for (int x = 0; x < 9; ++x)
+				{
+					var cell = this[x, y];
+					if (0 != cell.Value)
+					{
+						foreach((var u, var v) in SudokuCreator.InfluencedCoordinates(x, y))
+						{
+							this[u, v][cell.Value] = false;
+						}
+					}
+				}
 			}
 		}
 
@@ -128,9 +153,9 @@ namespace WpfSudoku.ViewModel
 		{
 			// convert
 			var field = new int[9, 9];
-			for (int x = 0; x < 9; ++x)
+			for (int y = 0; y < 9; ++y)
 			{
-				for (int y = 0; y < 9; ++y)
+				for (int x = 0; x < 9; ++x)
 				{
 					field[y, x] = (int)this[x, y].Value;
 					this[x, y].IsValid = true;

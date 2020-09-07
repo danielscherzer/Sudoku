@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using WpfSudoku.ViewModel;
 
 namespace WpfSudoku.View
@@ -14,7 +16,7 @@ namespace WpfSudoku.View
 		{
 			InitializeComponent();
 			DataContext = this;
-			//CompositionTarget.Rendering += (s, a) => Board.Fill();
+			//CompositionTarget.Rendering += async (s, a) => await Board.FillAsync();
 		}
 
 		public BoardViewModel Board { get; } = new BoardViewModel();
@@ -26,9 +28,6 @@ namespace WpfSudoku.View
 			if (System.Windows.Input.Key.Escape == e.Key) Close();
 		}
 
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			Board.Fill();
-		}
+		private async void Button_Click(object sender, RoutedEventArgs e) => await Board.FillAsync();
 	}
 }

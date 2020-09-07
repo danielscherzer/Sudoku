@@ -1,4 +1,7 @@
-﻿namespace WpfSudoku.ViewModel
+﻿using System.Collections;
+using System.Collections.Generic;
+
+namespace WpfSudoku.ViewModel
 {
 	public class CellViewModel : ViewModel
 	{
@@ -11,7 +14,6 @@
 			set
 			{
 				var bit = toBit[index];
-				if (0 != (bit & _values)) return; // already set
 				if (value)
 				{
 					_values |= bit;
@@ -21,6 +23,7 @@
 					_values &= ~bit;
 				}
 				InvokePropertyChanged();
+				InvokePropertyChanged(nameof(PossibleValues));
 			}
 		}
 
@@ -62,7 +65,18 @@
 			IsReadOnly = false;
 			IsValid = true;
 			Value = 0;
-			//_value = toBit[10];
+			_values = toBit[10];
+		}
+
+		public IEnumerable<PossibleValue> PossibleValues
+		{
+			get
+			{
+				for (uint i = 1; i < 10; ++i)
+				{
+					yield return new PossibleValue(i, Contains(i));
+				}
+			}
 		}
 
 		public override string ToString() => $"{Value}:{(IsReadOnly ? "R" : "")}{(IsValid ? "" : "I")}";
