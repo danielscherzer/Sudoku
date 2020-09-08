@@ -5,6 +5,9 @@
     <Application.Resources>
 		<SolidColorBrush x:Key="backgroundBrush" Color="White"/>
 		<SolidColorBrush x:Key="borderBrush" Color="Black"/>
-		<SolidColorBrush x:Key="selectionBrush" Color="CornflowerBlue"/>
+		<SolidColorBrush x:Key="activeBrush" Color="Yellow"/>
+		<SolidColorBrush x:Key="invalidBrush" Color="Red"/>
+		<SolidColorBrush x:Key="influencedBrush" Color="CornflowerBlue"/>
+		<SolidColorBrush x:Key="selectionBrush" Color="DodgerBlue"/>
 	</Application.Resources>
 </Application>

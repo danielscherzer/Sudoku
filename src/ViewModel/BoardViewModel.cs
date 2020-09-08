@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using WpfSudoku.Model;
@@ -12,17 +11,39 @@ namespace WpfSudoku.ViewModel
 
 		public BoardViewModel(int size)
 		{
-			PropertyChanged += BoardViewModel_PropertyChanged;
-			for (int i = 0; i < size; i++)
+			// create cells
+			Size = size;
+			var ss = Size * Size;
+			for (int row = 0; row < ss; ++row)
 			{
-				for (int j = 0; j < size; j++)
+				for (int column = 0; column < ss; ++column)
 				{
-					var block = new BlockViewModel(size);
-					foreach (var cell in block.Cells) cell.PropertyChanged += CellPropertyChanged;
-					Blocks.Add(block);
+					var cell = new CellViewModel(column, row);
+					cell.PropertyChanged += CellPropertyChanged;
+					_cells.Add(cell);
 				}
 			}
-			Size = size;
+			//create blocks
+			var blocks = new List<BlockViewModel>();
+			for (int b1 = 0; b1 < Size; ++b1)
+			{
+				for (int b0 = 0; b0 < Size; ++b0)
+				{
+					var blockCells = new List<CellViewModel>(9);
+					for (int row = b1 * Size; row < Size + b1 * Size; ++row)
+					{
+						for (int column = b0 * Size; column < Size + b0 * Size; ++column)
+						{
+							blockCells.Add(GetCell(column, row));
+						}
+					}
+					var block = new BlockViewModel(blockCells, Size);
+					foreach (var cell in block.Cells) cell.PropertyChanged += CellPropertyChanged;
+					blocks.Add(block);
+				}
+			}
+			Blocks = blocks;
+			PropertyChanged += BoardViewModel_PropertyChanged;
 			_ = FillAsync();
 		}
 
@@ -40,18 +61,10 @@ namespace WpfSudoku.ViewModel
 			set => Set(ref _activeValue, value);
 		}
 
-		private CellViewModel this[int row, int col]
-		{
-			get
-			{
-				if (row < 0 || row >= Size * Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
-				if (col < 0 || col >= Size * Size) throw new ArgumentOutOfRangeException(nameof(col), col, "Invalid Column Index");
-				var block = GetBlock(row / Size, col / Size);
-				return block[row % 3, col % 3];
-			}
-		}
+		private readonly List<CellViewModel> _cells = new List<CellViewModel>();
+		private CellViewModel GetCell(int col, int row) => _cells[col + Size * Size * row];
 
-		public ObservableCollection<BlockViewModel> Blocks { get; } = new ObservableCollection<BlockViewModel>();
+		public IEnumerable<BlockViewModel> Blocks { get; }
 
 		private bool _isWon = false;
 		public bool IsWon
@@ -72,13 +85,13 @@ namespace WpfSudoku.ViewModel
 		private void ConvertField(int[,] field)
 		{
 			var ss = Size * Size;
-			for (int y = 0; y < ss; ++y)
+			for (int column = 0; column < ss; ++column)
 			{
-				for (int x = 0; x < ss; ++x)
+				for (int row = 0; row < ss; ++row)
 				{
-					var cell = this[y, x];
+					var cell = GetCell(column, row);
 					cell.Reset();
-					var value = field[x, y];
+					var value = field[column, row];
 					if (0 != value)
 					{
 						cell.Value = (uint)value;
@@ -88,23 +101,23 @@ namespace WpfSudoku.ViewModel
 			}
 		}
 
-		private BlockViewModel GetBlock(int row, int col)
-		{
-			if (row < 0 || row >= Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
-			if (col < 0 || col >= Size) throw new ArgumentOutOfRangeException(nameof(col), col, "Invalid Column Index");
-			return Blocks[row * Size + col];
-		}
+		//private BlockViewModel GetBlock(int row, int col)
+		//{
+		//	if (row < 0 || row >= Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
+		//	if (col < 0 || col >= Size) throw new ArgumentOutOfRangeException(nameof(col), col, "Invalid Column Index");
+		//	return Blocks[row * Size + col];
+		//}
 
 		private void BoardViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			switch(e.PropertyName)
 			{
 				case nameof(ActiveValue): ActiveValueChanged(); break;
-				case nameof(CurrentCell): ActiveCellChanged(); break;
+				case nameof(CurrentCell): CurrentCellChanged(); break;
 			}
 		}
 
-		private void ActiveCellChanged()
+		private void CurrentCellChanged()
 		{
 			if (CurrentCell is null) return;
 
@@ -119,30 +132,37 @@ namespace WpfSudoku.ViewModel
 			}
 		}
 
-		private void ActiveValueChanged() => ForEachCell(cell => cell.IsActive = ActiveValue == cell.Value && cell.Value != 0);
+		private void ActiveValueChanged()
+		{
+			foreach (var cell in _cells)
+			{
+				cell.IsActive = ActiveValue == cell.Value && cell.Value != 0;
+			}
+		}
 
 		private void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (nameof(CellViewModel.Value) == e.PropertyName)
 			{
 				ActiveValueChanged();
-				RemoveFromPossibleValues();
+				//RemoveFromPossibleValues();
 				CheckValid();
 			}
 		}
 
 		private void RemoveFromPossibleValues()
 		{
-			for (int y = 0; y < 9; ++y)
+			var ss = Size * Size;
+			for (int column = 0; column < ss; ++column)
 			{
-				for (int x = 0; x < 9; ++x)
+				for (int row = 0; row < ss; ++row)
 				{
-					var cell = this[x, y];
+					var cell = GetCell(column, row);
 					if (0 != cell.Value)
 					{
-						foreach((var u, var v) in SudokuCreator.InfluencedCoordinates(x, y))
+						foreach((var u, var v) in SudokuCreator.InfluencedCoordinates(column, row))
 						{
-							this[u, v][cell.Value] = false;
+							GetCell(u, v)[cell.Value] = false;
 						}
 					}
 				}
@@ -153,33 +173,26 @@ namespace WpfSudoku.ViewModel
 		{
 			// convert
 			var field = new int[9, 9];
-			for (int y = 0; y < 9; ++y)
+			for (int column = 0; column < 9; ++column)
 			{
-				for (int x = 0; x < 9; ++x)
+				for (int row = 0; row < 9; ++row)
 				{
-					field[y, x] = (int)this[x, y].Value;
-					this[x, y].IsValid = true;
+					var cell = GetCell(column, row);
+					field[column, row] = (int)cell.Value;
+					cell.IsValid = true;
 				}
 			}
-			foreach((var x, var y) in ValidityChecks.EnumerateAllInvalidCells(field))
+			foreach((var column, var row) in ValidityChecks.EnumerateAllInvalidCells(field))
 			{
-				this[y, x].IsValid = false;
+				GetCell(column, row).IsValid = false;
 			}
 			// is won?
 			var won = true;
-			ForEachCell(cell => won &= cell.IsValid && 0 != cell.Value);
-			IsWon = won;
-		}
-
-		private void ForEachCell(Action<CellViewModel> action)
-		{
-			foreach (var block in Blocks)
+			foreach (var cell in _cells)
 			{
-				foreach (var cell in block.Cells)
-				{
-					action(cell);
-				}
+				won &= cell.IsValid && 0 != cell.Value;
 			}
+			IsWon = won;
 		}
 	}
 }

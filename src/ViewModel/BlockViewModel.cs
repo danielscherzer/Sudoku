@@ -1,34 +1,36 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 
 namespace WpfSudoku.ViewModel
 {
 	public class BlockViewModel : ViewModel
 	{
-		public BlockViewModel() : this(9) { }
-
-		public BlockViewModel(int size)
+		public BlockViewModel(IEnumerable<CellViewModel> cells, int size)
 		{
-			for (int i = 0; i < size * size; i++)
+			int count = 0;
+			foreach(var cell in cells)
 			{
-				CellViewModel cell = new CellViewModel();
-				Cells.Add(cell);
+				_cells.Add(cell);
+				++count;
 			}
 			Size = size;
+			if (Size * Size != count) throw new ArgumentOutOfRangeException(nameof(cells), count, $"Invalid number of cells given for size={size}");
 		}
 
-		public CellViewModel this[int row, int col]
-		{
-			get
-			{
-				if (row < 0 || row >= Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
-				if (col < 0 || col >= Size) throw new ArgumentOutOfRangeException(nameof(col), col, "Invalid Column Index");
-				return Cells[row * Size + col];
-			}
-		}
+		//public CellViewModel this[int col, int row]
+		//{
+		//	get
+		//	{
+		//		if (row < 0 || row >= Size) throw new ArgumentOutOfRangeException(nameof(row), row, "Invalid Row Index");
+		//		if (col < 0 || col >= Size) throw new ArgumentOutOfRangeException(nameof(col), col, "Invalid Column Index");
+		//		return _cells[row * Size + col];
+		//	}
+		//}
 
-		public ObservableCollection<CellViewModel> Cells { get; } = new ObservableCollection<CellViewModel>();
+		public IEnumerable<CellViewModel> Cells => _cells;
 
 		public int Size { get; }
+
+		private readonly List<CellViewModel> _cells = new List<CellViewModel>();
 	}
 }

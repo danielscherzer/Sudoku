@@ -48,7 +48,7 @@ namespace WpfSudoku.Model
 				value++;
 				b = value;
 			}
-			bool valid;
+			bool valid = true;
 			int counter = 0;
 			do
 			{

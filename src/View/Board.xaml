@@ -50,19 +50,22 @@
 		<DataTemplate x:Key ="BlockTemplate">
 			<DataTemplate.Resources>
 				<Style x:Key="borderStyle" TargetType="Border" >
-					<Setter Property="BorderBrush" Value="{DynamicResource borderBrush}"/>
-					<Setter Property="Background" Value="{DynamicResource backgroundBrush}"/>
+					<Setter Property="BorderBrush" Value="{StaticResource borderBrush}"/>
+					<Setter Property="Background" Value="{StaticResource backgroundBrush}"/>
 				</Style>
 				<Style x:Key="cellBorder" TargetType="Border" BasedOn="{StaticResource borderStyle}">
 					<Style.Triggers>
 						<Trigger Property ="IsMouseOver" Value="True">
-							<Setter Property= "Background" Value="{DynamicResource selectionBrush}"/>
+							<Setter Property= "Background" Value="{StaticResource selectionBrush}"/>
 						</Trigger>
 						<DataTrigger Binding="{Binding IsActive}" Value="true">
-							<Setter Property="Border.Background" Value="Yellow"/>
+							<Setter Property="Border.Background" Value="{StaticResource activeBrush}"/>
 						</DataTrigger>
 						<DataTrigger Binding="{Binding IsValid}" Value="False">
-							<Setter Property="Background" Value="red"/>
+							<Setter Property="Background" Value="{StaticResource invalidBrush}"/>
+						</DataTrigger>
+						<DataTrigger Binding="{Binding IsInfluenced}" Value="True">
+							<Setter Property="Background" Value="{StaticResource influencedBrush}"/>
 						</DataTrigger>
 					</Style.Triggers>
 				</Style>

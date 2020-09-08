@@ -5,6 +5,12 @@ namespace WpfSudoku.ViewModel
 {
 	public class CellViewModel : ViewModel
 	{
+		public CellViewModel(int column, int row)
+		{
+			Column = column;
+			Row = row;
+		}
+
 		public bool this[uint index]
 		{
 			get
@@ -32,6 +38,13 @@ namespace WpfSudoku.ViewModel
 		{
 			get => _isActive;
 			set => Set(ref _isActive, value);
+		}
+
+		private bool _isInfluenced = false;
+		public bool IsInfluenced
+		{
+			get => _isInfluenced;
+			set => Set(ref _isInfluenced, value);
 		}
 
 		private bool _isReadOnly = false;
@@ -62,6 +75,7 @@ namespace WpfSudoku.ViewModel
 		internal void Reset()
 		{
 			IsActive = false;
+			IsInfluenced = false;
 			IsReadOnly = false;
 			IsValid = true;
 			Value = 0;
@@ -78,6 +92,9 @@ namespace WpfSudoku.ViewModel
 				}
 			}
 		}
+
+		public int Column { get; }
+		public int Row { get; }
 
 		public override string ToString() => $"{Value}:{(IsReadOnly ? "R" : "")}{(IsValid ? "" : "I")}";
 

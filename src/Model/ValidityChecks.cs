@@ -20,21 +20,21 @@ namespace WpfSudoku.Model
 				{
 					var used = new int[9];
 					var firstUse = new (int, int)[9];
-					for (int x = b0 * 3; x < 3 + b0 * 3; ++x)
+					for (int column = b0 * 3; column < 3 + b0 * 3; ++column)
 					{
-						for (int y = b1 * 3; y < 3 + b1 * 3; ++y)
+						for (int row = b1 * 3; row < 3 + b1 * 3; ++row)
 						{
-							var value = board[x, y];
+							var value = board[column, row];
 							if (0 == value) continue;
 							if (0 == used[value - 1])
 							{
-								firstUse[value - 1] = (x, y);
+								firstUse[value - 1] = (column, row);
 								++used[value - 1];
 							}
 							else
 							{
 								++used[value - 1];
-								yield return (x, y);
+								yield return (column, row);
 							}
 						}
 					}
@@ -52,13 +52,13 @@ namespace WpfSudoku.Model
 
 		private static IEnumerable<(int, int)> EnumerateAllInvalidCellsColumns(int[,] board)
 		{
-			for (int x = 0; x < 9; ++x)
+			for (int column = 0; column < 9; ++column)
 			{
 				var used = new int[9];
 				var firstUse = new int[9];
 				for (int y = 0; y < 9; ++y)
 				{
-					var value = board[x, y];
+					var value = board[column, y];
 					if (0 == value) continue;
 					if (0 == used[value - 1])
 					{
@@ -68,7 +68,7 @@ namespace WpfSudoku.Model
 					else
 					{
 						++used[value - 1];
-						yield return (x, y);
+						yield return (column, y);
 					}
 				}
 				// also yield return first cell of multiple occurrence
@@ -76,7 +76,7 @@ namespace WpfSudoku.Model
 				{
 					if (1 < used[i])
 					{
-						yield return (x, firstUse[i]);
+						yield return (column, firstUse[i]);
 					}
 				}
 			}
@@ -84,23 +84,23 @@ namespace WpfSudoku.Model
 
 		private static IEnumerable<(int, int)> EnumerateAllInvalidCellsRows(int[,] board)
 		{
-			for (int y = 0; y < 9; ++y)
+			for (int row = 0; row < 9; ++row)
 			{
 				var used = new int[9];
 				var firstUse = new int[9];
-				for (int x = 0; x < 9; ++x)
+				for (int column = 0; column < 9; ++column)
 				{
-					var value = board[x, y];
+					var value = board[column, row];
 					if (0 == value) continue;
 					if (0 == used[value - 1])
 					{
-						firstUse[value - 1] = x;
+						firstUse[value - 1] = column;
 						++used[value - 1];
 					}
 					else
 					{
 						++used[value - 1];
-						yield return (x, y);
+						yield return (column, row);
 					}
 				}
 				// also yield return first cell of multiple occurrence
@@ -108,7 +108,7 @@ namespace WpfSudoku.Model
 				{
 					if (1 < used[i])
 					{
-						yield return (firstUse[i], y);
+						yield return (firstUse[i], row);
 					}
 				}
 			}
