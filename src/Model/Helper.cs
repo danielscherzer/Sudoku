@@ -23,7 +23,7 @@ namespace WpfSudoku.Model
 		{
 #if DEBUG
 			Console.Write(msg);
-			File.AppendAllText(@"d:\bench.log", msg);
+			//File.AppendAllText(@"d:\bench.log", msg);
 #endif
 		}
 	}

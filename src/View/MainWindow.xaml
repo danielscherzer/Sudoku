@@ -11,7 +11,7 @@
 		<StackPanel Orientation="Horizontal">
 			<Viewbox>
 				<Grid>
-					<ListBox x:Name="listBoxButtons" ItemsSource="{Binding Buttons}" 
+					<ListBox x:Name="listBoxButtons" ItemsSource="{Binding ActiveNumbers}" 
 						 HorizontalContentAlignment="Center" BorderBrush="Transparent" 
 						 Focusable="false" SelectedIndex="{Binding Board.ActiveValue}">
 						<ListBox.ItemContainerStyle>
@@ -41,7 +41,7 @@
 				</Grid>
 			</Viewbox>
 			<v:Board Margin="5" DataContext="{Binding Board}"/>
-			<Button Click="Button_Click">New</Button>
+			<Button Click="ButtonNew_Click">New</Button>
 		</StackPanel>
 	</Grid>
 </Window>

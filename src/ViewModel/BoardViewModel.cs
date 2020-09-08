@@ -61,9 +61,6 @@ namespace WpfSudoku.ViewModel
 			set => Set(ref _activeValue, value);
 		}
 
-		private readonly List<CellViewModel> _cells = new List<CellViewModel>();
-		private CellViewModel GetCell(int col, int row) => _cells[col + Size * Size * row];
-
 		public IEnumerable<BlockViewModel> Blocks { get; }
 
 		private bool _isWon = false;
@@ -81,6 +78,9 @@ namespace WpfSudoku.ViewModel
 			SudokuCreator.RemoveSome(field, 0.3);
 			ConvertField(field);
 		}
+
+		private readonly List<CellViewModel> _cells = new List<CellViewModel>();
+		private CellViewModel GetCell(int col, int row) => _cells[col + Size * Size * row];
 
 		private void ConvertField(int[,] field)
 		{
@@ -148,18 +148,27 @@ namespace WpfSudoku.ViewModel
 					UpdateCellActive(cell);
 					if (0 != cell.Value)
 					{
-						foreach ((var u, var v) in SudokuCreator.InfluencedCoordinates(cell.Column, cell.Row, Size))
-						{
-							GetCell(u, v)[cell.Value] = false;
-							//Helper.Log($"{u},{v}\n");
-						}
+						//foreach ((var u, var v) in SudokuCreator.InfluencedCoordinates(cell.Column, cell.Row, Size))
+						//{
+						//	GetCell(u, v)[cell.Value] = false;
+						//	//Helper.Log($"{u},{v}\n");
+						//}
 					}
 				}
 				CheckValid();
+				CheckWon();
 			}
 		}
 
-		private void UpdateCellActive(CellViewModel cell) => cell.IsActive = ActiveValue == cell.Value && cell.Value != 0;
+		private void CheckWon()
+		{
+			var won = true;
+			foreach (var cell in _cells)
+			{
+				won &= cell.IsValid && 0 != cell.Value;
+			}
+			IsWon = won;
+		}
 
 		private void CheckValid()
 		{
@@ -174,13 +183,8 @@ namespace WpfSudoku.ViewModel
 			{
 				GetCell(column, row).IsValid = false;
 			}
-			// is won?
-			var won = true;
-			foreach (var cell in _cells)
-			{
-				won &= cell.IsValid && 0 != cell.Value;
-			}
-			IsWon = won;
 		}
+
+		private void UpdateCellActive(CellViewModel cell) => cell.IsActive = ActiveValue == cell.Value && cell.Value != 0;
 	}
 }
