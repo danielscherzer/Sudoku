@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WpfSudoku.Model
 {
-	class SudokuCreator
+	public class SudokuCreator
 	{
 		public static int[,] Find()
 		{
@@ -141,10 +141,10 @@ namespace WpfSudoku.Model
 			}
 		}
 
-		public static IEnumerable<(int, int)> InfluencedCoordinates(int x, int y)
+		public static IEnumerable<(int, int)> InfluencedCoordinates(int x, int y, int blockSize)
 		{
 			// update row
-			for (int column = 0; column < 9; ++column)
+			for (int column = 0; column < blockSize * blockSize; ++column)
 			{
 				if (x != column)
 				{
@@ -152,7 +152,7 @@ namespace WpfSudoku.Model
 				}
 			}
 			// update column
-			for (int row = 0; row < 9; ++row)
+			for (int row = 0; row < blockSize * blockSize; ++row)
 			{
 				if (y != row)
 				{
@@ -160,16 +160,14 @@ namespace WpfSudoku.Model
 				}
 			}
 			// update box
-			var u0 = x % 3 * 3;
-			var v0 = y % 3 * 3;
-			for (int u = u0; u < 3 + u0; ++u)
+			var u0 = (x / blockSize) * blockSize;
+			var v0 = (y / blockSize) * blockSize;
+			for (int u = u0; u < blockSize + u0; ++u)
 			{
-				for (int v = v0; v < 3 + v0; ++v)
+				for (int v = v0; v < blockSize + v0; ++v)
 				{
-					if (u != x || v != y)
-					{
-						yield return (u, v);
-					}
+					if (u == x && v == y) continue;
+					yield return (u, v);
 				}
 			}
 		}

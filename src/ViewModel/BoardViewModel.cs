@@ -20,7 +20,7 @@ namespace WpfSudoku.ViewModel
 				{
 					var cell = new CellViewModel(column, row);
 					cell.PropertyChanged += CellPropertyChanged;
-					_cells.Add(cell);
+					_cells.Add(cell); // order of adding is important first along column, than rows
 				}
 			}
 			//create blocks
@@ -34,12 +34,12 @@ namespace WpfSudoku.ViewModel
 					{
 						for (int column = b0 * Size; column < Size + b0 * Size; ++column)
 						{
-							blockCells.Add(GetCell(column, row));
+							blockCells.Add(GetCell(column, row)); // order of adding is important first along column, than rows
 						}
 					}
 					var block = new BlockViewModel(blockCells, Size);
 					foreach (var cell in block.Cells) cell.PropertyChanged += CellPropertyChanged;
-					blocks.Add(block);
+					blocks.Add(block); // order of adding is important first along column, than rows
 				}
 			}
 			Blocks = blocks;
@@ -47,11 +47,11 @@ namespace WpfSudoku.ViewModel
 			_ = FillAsync();
 		}
 
-		private CellViewModel? _currentCell;
-		public CellViewModel? CurrentCell
+		private CellViewModel? _editCell;
+		public CellViewModel? EditCell
 		{
-			get => _currentCell;
-			set => Set(ref _currentCell, value);
+			get => _editCell;
+			set => Set(ref _editCell, value);
 		}
 
 		private uint _activeValue;
@@ -85,9 +85,9 @@ namespace WpfSudoku.ViewModel
 		private void ConvertField(int[,] field)
 		{
 			var ss = Size * Size;
-			for (int column = 0; column < ss; ++column)
+			for (int row = 0; row < ss; ++row)
 			{
-				for (int row = 0; row < ss; ++row)
+				for (int column = 0; column < ss; ++column)
 				{
 					var cell = GetCell(column, row);
 					cell.Reset();
@@ -113,22 +113,21 @@ namespace WpfSudoku.ViewModel
 			switch(e.PropertyName)
 			{
 				case nameof(ActiveValue): ActiveValueChanged(); break;
-				case nameof(CurrentCell): CurrentCellChanged(); break;
+				case nameof(EditCell): EditCellChanged(); break;
 			}
 		}
 
-		private void CurrentCellChanged()
+		private void EditCellChanged()
 		{
-			if (CurrentCell is null) return;
+			if (EditCell is null) return;
 
-			if (CurrentCell.IsReadOnly)
+			if (EditCell.IsReadOnly)
 			{
-				if (0 == CurrentCell.Value) return;
-				ActiveValue = CurrentCell.Value;
+				ActiveValue = EditCell.Value;
 			}
 			else
 			{
-				CurrentCell.Value = ActiveValue;
+				EditCell.Value = ActiveValue;
 			}
 		}
 
@@ -136,7 +135,7 @@ namespace WpfSudoku.ViewModel
 		{
 			foreach (var cell in _cells)
 			{
-				cell.IsActive = ActiveValue == cell.Value && cell.Value != 0;
+				UpdateCellActive(cell);
 			}
 		}
 
@@ -144,43 +143,32 @@ namespace WpfSudoku.ViewModel
 		{
 			if (nameof(CellViewModel.Value) == e.PropertyName)
 			{
-				ActiveValueChanged();
-				//RemoveFromPossibleValues();
+				if (sender is CellViewModel cell)
+				{
+					UpdateCellActive(cell);
+					if (0 != cell.Value)
+					{
+						foreach ((var u, var v) in SudokuCreator.InfluencedCoordinates(cell.Column, cell.Row, Size))
+						{
+							GetCell(u, v)[cell.Value] = false;
+							//Helper.Log($"{u},{v}\n");
+						}
+					}
+				}
 				CheckValid();
 			}
 		}
 
-		private void RemoveFromPossibleValues()
-		{
-			var ss = Size * Size;
-			for (int column = 0; column < ss; ++column)
-			{
-				for (int row = 0; row < ss; ++row)
-				{
-					var cell = GetCell(column, row);
-					if (0 != cell.Value)
-					{
-						foreach((var u, var v) in SudokuCreator.InfluencedCoordinates(column, row))
-						{
-							GetCell(u, v)[cell.Value] = false;
-						}
-					}
-				}
-			}
-		}
+		private void UpdateCellActive(CellViewModel cell) => cell.IsActive = ActiveValue == cell.Value && cell.Value != 0;
 
 		private void CheckValid()
 		{
-			// convert
+			// convert cells to field
 			var field = new int[9, 9];
-			for (int column = 0; column < 9; ++column)
+			foreach(var cell in _cells)
 			{
-				for (int row = 0; row < 9; ++row)
-				{
-					var cell = GetCell(column, row);
-					field[column, row] = (int)cell.Value;
-					cell.IsValid = true;
-				}
+				field[cell.Column, cell.Row] = (int)cell.Value;
+				cell.IsValid = true;
 			}
 			foreach((var column, var row) in ValidityChecks.EnumerateAllInvalidCells(field))
 			{

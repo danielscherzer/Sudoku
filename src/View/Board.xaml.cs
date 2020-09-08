@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using WpfSudoku.ViewModel;
 
@@ -32,7 +31,7 @@ namespace WpfSudoku.View
 			var cell = element?.DataContext as CellViewModel;
 			if (DataContext is BoardViewModel board)
 			{
-				board.CurrentCell = cell;
+				board.EditCell = cell;
 				if (MouseButton.Right == e.ChangedButton && cell != null)
 				{
 					cell.Value = 0;
