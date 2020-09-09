@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace WpfSudoku.ViewModel
 {
-	public class BlockViewModel : ViewModel
+	public class BlockViewModel : ViewModel<BlockViewModel>
 	{
 		public BlockViewModel(IEnumerable<CellViewModel> cells, int size)
 		{

@@ -5,7 +5,7 @@ using WpfSudoku.Model;
 
 namespace WpfSudoku.ViewModel
 {
-	public class BoardViewModel : ViewModel
+	public class BoardViewModel : ViewModel<BoardViewModel>
 	{
 		public BoardViewModel() : this(3) { }
 
@@ -19,7 +19,7 @@ namespace WpfSudoku.ViewModel
 				for (int column = 0; column < ss; ++column)
 				{
 					var cell = new CellViewModel(column, row);
-					cell.PropertyChanged += CellPropertyChanged;
+					cell.AddPropertyChangedHandler(() => cell.Value, CellValueChanged);
 					_cells.Add(cell); // order of adding is important first along column, than rows
 				}
 			}
@@ -38,12 +38,12 @@ namespace WpfSudoku.ViewModel
 						}
 					}
 					var block = new BlockViewModel(blockCells, Size);
-					foreach (var cell in block.Cells) cell.PropertyChanged += CellPropertyChanged;
 					blocks.Add(block); // order of adding is important first along column, than rows
 				}
 			}
 			Blocks = blocks;
-			PropertyChanged += BoardViewModel_PropertyChanged;
+			AddPropertyChangedHandler(nameof(ActiveValue), ActiveValueChanged);
+			AddPropertyChangedHandler(nameof(EditCell), EditCellChanged);
 			_ = FillAsync();
 		}
 
@@ -108,15 +108,6 @@ namespace WpfSudoku.ViewModel
 		//	return Blocks[row * Size + col];
 		//}
 
-		private void BoardViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-		{
-			switch(e.PropertyName)
-			{
-				case nameof(ActiveValue): ActiveValueChanged(); break;
-				case nameof(EditCell): EditCellChanged(); break;
-			}
-		}
-
 		private void EditCellChanged()
 		{
 			if (EditCell is null) return;
@@ -139,25 +130,19 @@ namespace WpfSudoku.ViewModel
 			}
 		}
 
-		private void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void CellValueChanged(CellViewModel cell, uint oldValue)
 		{
-			if (nameof(CellViewModel.Value) == e.PropertyName)
+			UpdateCellActive(cell);
+			if (0 != cell.Value)
 			{
-				if (sender is CellViewModel cell)
-				{
-					UpdateCellActive(cell);
-					if (0 != cell.Value)
-					{
-						//foreach ((var u, var v) in SudokuCreator.InfluencedCoordinates(cell.Column, cell.Row, Size))
-						//{
-						//	GetCell(u, v)[cell.Value] = false;
-						//	//Helper.Log($"{u},{v}\n");
-						//}
-					}
-				}
-				CheckValid();
-				CheckWon();
+				//foreach ((var u, var v) in SudokuCreator.InfluencedCoordinates(cell.Column, cell.Row, Size))
+				//{
+				//	GetCell(u, v)[cell.Value] = false;
+				//	//Helper.Log($"{u},{v}\n");
+				//}
 			}
+			CheckValid();
+			CheckWon();
 		}
 
 		private void CheckWon()

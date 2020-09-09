@@ -1,9 +1,10 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace WpfSudoku.ViewModel
 {
-	public class CellViewModel : ViewModel
+	public class CellViewModel : ViewModel<CellViewModel>
 	{
 		public CellViewModel(int column, int row)
 		{
