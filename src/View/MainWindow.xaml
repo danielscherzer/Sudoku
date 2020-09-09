@@ -14,11 +14,21 @@
 					<ListBox x:Name="listBoxButtons" ItemsSource="{Binding ActiveNumbers}" 
 						 HorizontalContentAlignment="Center" BorderBrush="Transparent" 
 						 Focusable="false" SelectedIndex="{Binding Board.ActiveValue}">
+						<ListBox.Resources>
+							<v:BooleanToFontWeightConverter x:Key="BooleanToFontWeightConverter" />
+						</ListBox.Resources>
 						<ListBox.ItemContainerStyle>
 							<Style TargetType="ListBoxItem">
 								<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
 							</Style>
 						</ListBox.ItemContainerStyle>
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Text="{Binding Text}" FontWeight="{Binding IsFull, Converter={StaticResource BooleanToFontWeightConverter}}"/>
+								</StackPanel>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
 					</ListBox>
 					<!--won screen-->
 					<Viewbox>

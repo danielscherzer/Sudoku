@@ -37,12 +37,12 @@ namespace WpfSudoku.ViewModel
 		{
 			var oldValue = backendStore;
 			backendStore = value;
-			InvokePropertyChanged(oldValue, propertyName);
+			NotifyPropertyChanged(oldValue, propertyName);
 		}
 
-		protected void InvokePropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		
-		protected void InvokePropertyChanged<T>(T oldValue, [CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedExtendedEventArgs<T>(propertyName, oldValue));
+		protected void NotifyPropertyChanged<T>(T oldValue, [CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedExtendedEventArgs<T>(propertyName, oldValue));
 
 		private interface IHandler
 		{

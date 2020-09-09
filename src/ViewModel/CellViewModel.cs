@@ -29,8 +29,8 @@ namespace WpfSudoku.ViewModel
 				{
 					_values &= ~bit;
 				}
-				InvokePropertyChanged();
-				InvokePropertyChanged(nameof(PossibleValues));
+				NotifyPropertyChanged();
+				NotifyPropertyChanged(nameof(PossibleValues));
 			}
 		}
 
