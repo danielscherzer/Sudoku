@@ -5,13 +5,13 @@ using System.Linq;
 namespace WpfSudoku.Model.Tests
 {
 	[TestClass()]
-	public class SudokuCreatorTests
+	public class SudokuTests
 	{
 		[DataTestMethod]
 		[DynamicData(nameof(GetData), DynamicDataSourceType.Method)]
 		public void InfluencedCoordinatesTest(int x, int y, int blockSize, List<(int, int)> expected)
 		{
-			var actual = SudokuCreator.InfluencedCoordinates(x, y, blockSize);
+			var actual = Sudoku.InterdependentFields(x, y, blockSize);
 			CollectionAssert.AreEquivalent(expected.Distinct().ToArray(), actual.Distinct().ToArray());
 		}
 

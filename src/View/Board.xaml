@@ -17,7 +17,7 @@
 				<v:BooleanToFontWeightConverter x:Key="BooleanToFontWeightConverter" />
 				<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 				<DataTemplate x:Key ="emptyCellTemplate">
-						<ItemsControl ItemsSource ="{Binding PossibleValues}">
+						<!--<ItemsControl ItemsSource ="{Binding PossibleValues}">
 							<ItemsControl.ItemsPanel>
 								<ItemsPanelTemplate>
 									<UniformGrid/>
@@ -31,7 +31,7 @@
 									</Viewbox>
 								</DataTemplate>
 							</ItemsControl.ItemTemplate>
-						</ItemsControl>
+						</ItemsControl>-->
 				</DataTemplate>
 				<DataTemplate x:Key ="cellTemplate">
 					<TextBlock HorizontalAlignment ="Center" VerticalAlignment ="Center" 

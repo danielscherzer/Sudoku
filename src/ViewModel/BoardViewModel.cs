@@ -74,8 +74,8 @@ namespace WpfSudoku.ViewModel
 
 		public async Task FillAsync()
 		{
-			var field = await SudokuCreator.FindAsync();
-			SudokuCreator.RemoveSome(field, 0.3);
+			var field = await Sudoku.FindAsync();
+			Sudoku.RemoveSome(field, 0.3);
 			ConvertField(field);
 		}
 
@@ -135,11 +135,11 @@ namespace WpfSudoku.ViewModel
 			UpdateCellActive(cell);
 			if (0 != cell.Value)
 			{
-				//foreach ((var u, var v) in SudokuCreator.InfluencedCoordinates(cell.Column, cell.Row, Size))
-				//{
-				//	GetCell(u, v)[cell.Value] = false;
-				//	//Helper.Log($"{u},{v}\n");
-				//}
+				foreach ((var u, var v) in Sudoku.InterdependentFields(cell.Column, cell.Row, Size))
+				{
+					GetCell(u, v)[cell.Value] = false;
+					//Helper.Log($"{u},{v}\n");
+				}
 			}
 			CheckValid();
 			CheckWon();
