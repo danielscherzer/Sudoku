@@ -74,14 +74,16 @@ namespace WpfSudoku.ViewModel
 
 		public async Task FillAsync()
 		{
-			var field = await Sudoku.FindAsync();
+			var field = await Task.Run(() => Sudoku.Find());
 			Sudoku.RemoveSome(field, 0.5);
 			ConvertField(field);
 		}
 
 		public async Task SolveAsync()
 		{
-			throw new System.NotImplementedException();
+			var field = ToField();
+			await Task.Run(() => Sudoku.Solve(field));
+			ConvertField(field);
 		}
 
 		private readonly List<CellViewModel> _cells = new List<CellViewModel>();
@@ -162,17 +164,25 @@ namespace WpfSudoku.ViewModel
 
 		private void CheckValid()
 		{
-			// convert cells to field
-			var field = new int[9, 9];
-			foreach(var cell in _cells)
+			foreach (var cell in _cells)
 			{
-				field[cell.Column, cell.Row] = (int)cell.Value;
 				cell.IsValid = true;
 			}
-			foreach((var column, var row) in ValidityChecks.EnumerateAllInvalidCells(field))
+			var field = ToField();
+			foreach ((var column, var row) in ValidityChecks.EnumerateAllInvalidCells(field))
 			{
 				GetCell(column, row).IsValid = false;
 			}
+		}
+
+		private int[,] ToField()
+		{
+			var field = new int[9, 9];
+			foreach (var cell in _cells)
+			{
+				field[cell.Column, cell.Row] = (int)cell.Value;
+			}
+			return field;
 		}
 
 		private void UpdateCellActive(CellViewModel cell) => cell.IsActive = ActiveValue == cell.Value && cell.Value != 0;

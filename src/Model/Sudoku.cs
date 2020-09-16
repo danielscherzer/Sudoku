@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace WpfSudoku.Model
 {
@@ -10,42 +8,9 @@ namespace WpfSudoku.Model
 	{
 		public static int[,] Find()
 		{
-
-			var timer = Stopwatch.StartNew();
-			var field = CreateWithFullSearch();
-			Helper.Log($"{timer.ElapsedMilliseconds}ms\n");
+			int[,] field = new int[9, 9];
+			Helper.Benchmark(() => field = CreateWithFullSearch());
 			return field;
-		}
-
-		public static async Task<int[,]> FindAsync()
-		{
-			return await Task.Run(() => Find());
-		}
-
-		public static void RemoveSome(int[,] field, double propability)
-		{
-			var rnd = new Random();
-			for (int x = 0; x < field.GetLength(0); ++x)
-			{
-				for (int y = 0; y < field.GetLength(1); ++y)
-				{
-					if (rnd.NextDouble() < propability)
-					{
-						field[x, y] = 0;
-					}
-				}
-			}
-		}
-
-		public static HashSet<int> SimplePossibleChoices(int[,] field, int x, int y, int blockSize)
-		{
-			int[] fullSet = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-			var possibleChoices = new HashSet<int>(fullSet);
-			foreach ((var column, var row) in InterdependentFields(x, y, blockSize))
-			{
-				possibleChoices.Remove(field[column, row]);
-			}
-			return possibleChoices;
 		}
 
 		public static IEnumerable<(int, int)> InterdependentFields(int x, int y, int blockSize)
@@ -76,6 +41,60 @@ namespace WpfSudoku.Model
 					if (u == x && v == y) continue;
 					yield return (u, v);
 				}
+			}
+		}
+
+		public static void RemoveSome(int[,] field, double propability)
+		{
+			var rnd = new Random();
+			for (int x = 0; x < field.GetLength(0); ++x)
+			{
+				for (int y = 0; y < field.GetLength(1); ++y)
+				{
+					if (rnd.NextDouble() < propability)
+					{
+						field[x, y] = 0;
+					}
+				}
+			}
+		}
+
+		public static HashSet<int> SimplePossibleChoices(int[,] field, int x, int y, int blockSize)
+		{
+			int[] fullSet = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+			var possibleChoices = new HashSet<int>(fullSet);
+			foreach ((var column, var row) in InterdependentFields(x, y, blockSize))
+			{
+				possibleChoices.Remove(field[column, row]);
+			}
+			return possibleChoices;
+		}
+
+		public static void Solve(int[,] field)
+		{
+			var inputField = new int[9, 9];
+			field.CopyTo(inputField, 0);
+			var choices = new int[9 * 9];
+			static (int, int) Coord(int index) => (index % 9, index / 9);
+			for (int i = 0; i < 81; ++i)
+			{
+				var (x, y) = Coord(i);
+				var originalValue = inputField[x, y];
+				if (0 != originalValue) continue; // only try to solve empty cells
+				do
+				{
+					choices[i]++;
+					if (choices[i] > 9)
+					{
+						// tried all choices for this cell -> backtrack
+						choices[i] = 0;
+						field[x, y] = 0;
+						i -= 2;
+						break;
+					}
+					field[x, y] = choices[i];
+
+				} while (!ValidityChecks.All(field));
 			}
 		}
 
