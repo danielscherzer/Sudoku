@@ -3,16 +3,24 @@ using System.Linq;
 
 namespace WpfSudoku.Model
 {
-	internal class ValidityChecks
+	public static class ValidityChecks
 	{
-		internal static IEnumerable<(int, int)> EnumerateAllInvalidCells(int[,] board)
+		public static bool All(UniformGrid<int> board) => Boxes(board) && Columns(board) && Rows(board);
+
+		public static bool Boxes(UniformGrid<int> board) => !EnumerateAllInvalidCellsBoxes(board).Any();
+
+		public static bool Columns(UniformGrid<int> board) => !EnumerateAllInvalidCellsColumns(board).Any();
+
+		public static bool Rows(UniformGrid<int> board) => !EnumerateAllInvalidCellsRows(board).Any();
+
+		public static IEnumerable<(int, int)> EnumerateAllInvalidCells(UniformGrid<int> board)
 		{
 			foreach (var cell in EnumerateAllInvalidCellsBoxes(board)) yield return cell;
 			foreach (var cell in EnumerateAllInvalidCellsColumns(board)) yield return cell;
 			foreach (var cell in EnumerateAllInvalidCellsRows(board)) yield return cell;
 		}
 
-		private static IEnumerable<(int, int)> EnumerateAllInvalidCellsBoxes(int[,] board)
+		private static IEnumerable<(int, int)> EnumerateAllInvalidCellsBoxes(UniformGrid<int> board)
 		{
 			for (int b0 = 0; b0 < 3; ++b0)
 			{
@@ -50,7 +58,7 @@ namespace WpfSudoku.Model
 			}
 		}
 
-		private static IEnumerable<(int, int)> EnumerateAllInvalidCellsColumns(int[,] board)
+		private static IEnumerable<(int, int)> EnumerateAllInvalidCellsColumns(UniformGrid<int> board)
 		{
 			for (int column = 0; column < 9; ++column)
 			{
@@ -82,7 +90,7 @@ namespace WpfSudoku.Model
 			}
 		}
 
-		private static IEnumerable<(int, int)> EnumerateAllInvalidCellsRows(int[,] board)
+		private static IEnumerable<(int, int)> EnumerateAllInvalidCellsRows(UniformGrid<int> board)
 		{
 			for (int row = 0; row < 9; ++row)
 			{
@@ -113,13 +121,5 @@ namespace WpfSudoku.Model
 				}
 			}
 		}
-
-		internal static bool All(int[,] board) => Boxes(board) && Columns(board) && Rows(board);
-
-		internal static bool Boxes(int[,] board) => !EnumerateAllInvalidCellsBoxes(board).Any();
-
-		internal static bool Columns(int[,] board) => !EnumerateAllInvalidCellsColumns(board).Any();
-
-		internal static bool Rows(int[,] board) => !EnumerateAllInvalidCellsRows(board).Any();
 	}
 }

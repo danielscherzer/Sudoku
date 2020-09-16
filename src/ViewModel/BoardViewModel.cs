@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using WpfSudoku.Model;
 
@@ -76,8 +75,8 @@ namespace WpfSudoku.ViewModel
 		{
 			var field = await Task.Run(() =>
 			{
-				int[,] field = new int[9, 9];
-				Helper.Benchmark(() => field = Sudoku.Find());
+				var field = new UniformGrid<int>(9);
+				Helper.Benchmark(() => field = Sudoku.Create());
 				return field;
 			});
 			Sudoku.RemoveSome(field, 0.5);
@@ -87,19 +86,21 @@ namespace WpfSudoku.ViewModel
 		public async Task SolveAsync()
 		{
 			var field = ToField();
-			await Task.Run(() => Sudoku.Solve(field));
+			await Task.Run(() =>
+			{
+				Helper.Benchmark(() => Sudoku.Solve(field));
+			});
 			ConvertField(field);
 		}
 
 		private readonly List<CellViewModel> _cells = new List<CellViewModel>();
 		private CellViewModel GetCell(int col, int row) => _cells[col + Size * Size * row];
 
-		private void ConvertField(int[,] field)
+		private void ConvertField(UniformGrid<int> field)
 		{
-			var ss = Size * Size;
-			for (int row = 0; row < ss; ++row)
+			for (int row = 0; row < field.Size; ++row)
 			{
-				for (int column = 0; column < ss; ++column)
+				for (int column = 0; column < field.Size; ++column)
 				{
 					var cell = GetCell(column, row);
 					cell.Reset();
@@ -180,9 +181,9 @@ namespace WpfSudoku.ViewModel
 			}
 		}
 
-		private int[,] ToField()
+		private UniformGrid<int> ToField()
 		{
-			var field = new int[9, 9];
+			var field = new UniformGrid<int>(9);
 			foreach (var cell in _cells)
 			{
 				field[cell.Column, cell.Row] = (int)cell.Value;

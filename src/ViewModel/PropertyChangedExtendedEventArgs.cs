@@ -2,7 +2,7 @@
 
 namespace WpfSudoku.ViewModel
 {
-	class PropertyChangedExtendedEventArgs<T>: PropertyChangedEventArgs
+	internal class PropertyChangedExtendedEventArgs<T> : PropertyChangedEventArgs
 	{
 		public T OldValue { get; }
 

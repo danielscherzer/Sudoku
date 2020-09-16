@@ -41,7 +41,7 @@ namespace WpfSudoku.ViewModel
 		}
 
 		protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		
+
 		protected void NotifyPropertyChanged<T>(T oldValue, [CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedExtendedEventArgs<T>(propertyName, oldValue));
 
 		private interface IHandler

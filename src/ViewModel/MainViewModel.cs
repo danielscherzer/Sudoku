@@ -24,7 +24,7 @@ namespace WpfSudoku.ViewModel
 
 		private void CellValueChanged()
 		{
-			for(int i = 0; i < _activeNumbers.Length; ++i)
+			for (int i = 0; i < _activeNumbers.Length; ++i)
 			{
 				_activeNumbers[i].Count = 0;
 			}
@@ -32,7 +32,7 @@ namespace WpfSudoku.ViewModel
 			{
 				foreach (var cell in block.Cells)
 				{
-					if(0 != cell.Value && cell.IsValid) _activeNumbers[cell.Value].Count++;
+					if (0 != cell.Value && cell.IsValid) _activeNumbers[cell.Value].Count++;
 				}
 			}
 			NotifyPropertyChanged(nameof(ActiveNumbers));

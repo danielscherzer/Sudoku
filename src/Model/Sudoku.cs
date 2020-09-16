@@ -6,24 +6,24 @@ namespace WpfSudoku.Model
 {
 	public static class Sudoku
 	{
-		public static int[,] Find()
+		public static UniformGrid<int> Create()
 		{
 			var rnd = new Random();
-			var field = new int[9, 9];
-			var tries = new int[9 * 9];
+			const int size = 9;
+			const int ss = size * size;
+			var field = new UniformGrid<int>(size);
+			var tries = new int[ss];
 			//each cell has its own order of trying the numbers 1-9
-			var allChoicesRnd = new int[9 * 9][];
-			for (int i = 0; i < 81; ++i)
+			var allChoicesRnd = new int[ss][];
+			for (int i = 0; i < ss; ++i)
 			{
 				var valueList = Enumerable.Range(1, 9).ToArray(); // performance side-note: this line is quicker inside of the for loop, then outside!?
 				Shuffle(valueList, rnd);
 				allChoicesRnd[i] = valueList;
 			}
-			static (int, int) Coord(int index) => (index % 9, index / 9);
 
-			for (int i = 0; i < 81; ++i)
+			for (int i = 0; i < ss; ++i)
 			{
-				var (x, y) = Coord(i);
 				do
 				{
 					tries[i]++;
@@ -31,11 +31,11 @@ namespace WpfSudoku.Model
 					{
 						// tried all choices for this cell -> backtrack
 						tries[i] = 0;
-						field[x, y] = 0;
+						field.Array[i] = 0;
 						i -= 2;
 						break;
 					}
-					field[x, y] = allChoicesRnd[i][tries[i] - 1];
+					field.Array[i] = allChoicesRnd[i][tries[i] - 1];
 
 				} while (!ValidityChecks.All(field));
 			}
@@ -73,22 +73,19 @@ namespace WpfSudoku.Model
 			}
 		}
 
-		public static void RemoveSome(int[,] field, double propability)
+		public static void RemoveSome(UniformGrid<int> field, double propability)
 		{
 			var rnd = new Random();
-			for (int x = 0; x < field.GetLength(0); ++x)
+			for (int i = 0; i < field.Size * field.Size; ++i)
 			{
-				for (int y = 0; y < field.GetLength(1); ++y)
+				if (rnd.NextDouble() < propability)
 				{
-					if (rnd.NextDouble() < propability)
-					{
-						field[x, y] = 0;
-					}
+					field.Array[i] = 0;
 				}
 			}
 		}
 
-		public static HashSet<int> SimplePossibleChoices(int[,] field, int x, int y, int blockSize)
+		public static HashSet<int> SimplePossibleChoices(UniformGrid<int> field, int x, int y, int blockSize)
 		{
 			int[] fullSet = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 			var possibleChoices = new HashSet<int>(fullSet);
@@ -99,18 +96,22 @@ namespace WpfSudoku.Model
 			return possibleChoices;
 		}
 
-		public static void Solve(int[,] field)
+		public static void Solve(UniformGrid<int> field)
 		{
-			//var inputField = new int[9, 9];
-			var inputField = new UniformGrid<int>(field);
-			//field.CopyTo(inputField, 0);
-			var choices = new int[9 * 9];
-			static (int, int) Coord(int index) => (index % 9, index / 9);
-			for (int i = 0; i < 81; ++i)
+			// only need to solve empty cells
+			var emptyFieldIds = new List<int>();
+			for (int i = 0; i < field.Size * field.Size; ++i)
 			{
-				var (x, y) = Coord(i);
-				var originalValue = inputField[x, y];
-				if (0 != originalValue) continue; // only try to solve empty cells
+				if(0 == field.Array[i])
+				{
+					emptyFieldIds.Add(i);
+				}
+			}
+
+			var choices = new int[emptyFieldIds.Count];
+			for (int i = 0; i < emptyFieldIds.Count; ++i)
+			{
+				var currentId = emptyFieldIds[i];
 				do
 				{
 					choices[i]++;
@@ -118,11 +119,11 @@ namespace WpfSudoku.Model
 					{
 						// tried all choices for this cell -> backtrack
 						choices[i] = 0;
-						field[x, y] = 0;
+						field.Array[currentId] = 0;
 						i -= 2;
 						break;
 					}
-					field[x, y] = choices[i];
+					field.Array[currentId] = choices[i];
 
 				} while (!ValidityChecks.All(field));
 			}

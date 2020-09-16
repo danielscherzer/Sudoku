@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace WpfSudoku.Model
 {
-	class UniformGrid<T>
+	public class UniformGrid<T>
 	{
 		public UniformGrid(int size)
 		{
@@ -11,10 +11,15 @@ namespace WpfSudoku.Model
 			Size = size;
 		}
 
-		public UniformGrid([NotNull] T[] array, int size)
+		public UniformGrid([NotNull] T[] array, int size, bool copy)
 		{
 			Array = array ?? throw new ArgumentNullException(nameof(array));
-			if(array.Length != size * size) throw new ArgumentException($"{nameof(array)} length={array.Length} does not match size={size} squared.");
+			if (copy)
+			{
+				Array = new T[size * size];
+				array.CopyTo(array, 0);
+			}
+			if (array.Length != size * size) throw new ArgumentException($"{nameof(array)} length={array.Length} does not match size={size} squared.");
 			Size = size;
 		}
 

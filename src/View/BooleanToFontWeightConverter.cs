@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace WpfSudoku.View
 {
-	class BooleanToFontWeightConverter : IValueConverter
+	internal class BooleanToFontWeightConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{

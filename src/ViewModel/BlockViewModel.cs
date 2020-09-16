@@ -8,7 +8,7 @@ namespace WpfSudoku.ViewModel
 		public BlockViewModel(IEnumerable<CellViewModel> cells, int size)
 		{
 			int count = 0;
-			foreach(var cell in cells)
+			foreach (var cell in cells)
 			{
 				_cells.Add(cell);
 				++count;
