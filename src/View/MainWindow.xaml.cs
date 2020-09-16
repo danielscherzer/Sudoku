@@ -24,5 +24,7 @@ namespace WpfSudoku.View
 		}
 
 		private async void ButtonNew_Click(object sender, RoutedEventArgs e) => await viewModel.Board.FillAsync();
+
+		private async void ButtonSolve_Click(object sender, RoutedEventArgs e) => await viewModel.Board.SolveAsync();
 	}
 }

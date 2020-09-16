@@ -12,7 +12,7 @@ namespace WpfSudoku.Model
 		{
 
 			var timer = Stopwatch.StartNew();
-			var field = CreateFullSearch();
+			var field = CreateWithFullSearch();
 			Helper.Log($"{timer.ElapsedMilliseconds}ms\n");
 			return field;
 		}
@@ -35,42 +35,6 @@ namespace WpfSudoku.Model
 					}
 				}
 			}
-		}
-
-		private static int[,] CreateFullSearch()
-		{
-			var rnd = new Random();
-			var field = new int[9, 9];
-			var tries = new int[9 * 9];
-			//each cell has its own order of trying the numbers 1-9
-			var allChoicesRnd = new int[9 * 9][];
-			for (int i = 0; i < 81; ++i)
-			{
-				var valueList = Enumerable.Range(1, 9).ToArray(); // performance side-note: this line is quicker inside of the for loop, then outside!?
-				Shuffle(valueList, rnd);
-				allChoicesRnd[i] = valueList;
-			}
-			static (int, int) Coord(int index) => (index % 9, index / 9);
-
-			for(int i = 0; i < 81; ++i)
-			{
-				var (x, y) = Coord(i);
-				do
-				{
-					tries[i]++;
-					if (tries[i] > 9)
-					{
-						// tried all choices for this cell -> backtrack
-						tries[i] = 0;
-						field[x, y] = 0;
-						i -= 2;
-						break;
-					}
-					field[x, y] = allChoicesRnd[i][tries[i] - 1];
-
-				} while (!ValidityChecks.All(field));
-			}
-			return field;
 		}
 
 		public static HashSet<int> SimplePossibleChoices(int[,] field, int x, int y, int blockSize)
@@ -113,6 +77,42 @@ namespace WpfSudoku.Model
 					yield return (u, v);
 				}
 			}
+		}
+
+		private static int[,] CreateWithFullSearch()
+		{
+			var rnd = new Random();
+			var field = new int[9, 9];
+			var tries = new int[9 * 9];
+			//each cell has its own order of trying the numbers 1-9
+			var allChoicesRnd = new int[9 * 9][];
+			for (int i = 0; i < 81; ++i)
+			{
+				var valueList = Enumerable.Range(1, 9).ToArray(); // performance side-note: this line is quicker inside of the for loop, then outside!?
+				Shuffle(valueList, rnd);
+				allChoicesRnd[i] = valueList;
+			}
+			static (int, int) Coord(int index) => (index % 9, index / 9);
+
+			for (int i = 0; i < 81; ++i)
+			{
+				var (x, y) = Coord(i);
+				do
+				{
+					tries[i]++;
+					if (tries[i] > 9)
+					{
+						// tried all choices for this cell -> backtrack
+						tries[i] = 0;
+						field[x, y] = 0;
+						i -= 2;
+						break;
+					}
+					field[x, y] = allChoicesRnd[i][tries[i] - 1];
+
+				} while (!ValidityChecks.All(field));
+			}
+			return field;
 		}
 
 		private static void Shuffle(int[] numbers, Random rnd)

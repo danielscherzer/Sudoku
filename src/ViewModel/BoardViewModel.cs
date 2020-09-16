@@ -75,8 +75,13 @@ namespace WpfSudoku.ViewModel
 		public async Task FillAsync()
 		{
 			var field = await Sudoku.FindAsync();
-			Sudoku.RemoveSome(field, 0.3);
+			Sudoku.RemoveSome(field, 0.5);
 			ConvertField(field);
+		}
+
+		public async Task SolveAsync()
+		{
+			throw new System.NotImplementedException();
 		}
 
 		private readonly List<CellViewModel> _cells = new List<CellViewModel>();

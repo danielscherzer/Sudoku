@@ -8,6 +8,12 @@
 		Title="MainWindow" Height="450" Width="650" Background="{DynamicResource backgroundBrush}"
 		KeyDown="Window_KeyDown">
 	<Viewbox>
+		<Viewbox.Resources>
+			<Style TargetType="Button">
+				<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+				<Setter Property="Background" Value="{DynamicResource backgroundBrush}"/>
+			</Style>
+		</Viewbox.Resources>
 		<StackPanel Orientation="Horizontal">
 			<Viewbox>
 				<Grid>
@@ -51,7 +57,8 @@
 				</Grid>
 			</Viewbox>
 			<v:Board Margin="5" DataContext="{Binding Board}"/>
-			<Button Margin="5" Click="ButtonNew_Click" FocusVisualStyle="{x:Null}">New</Button>
+			<Button Margin="5" Click="ButtonNew_Click">New</Button>
+			<Button Margin="5" Click="ButtonSolve_Click">Solve</Button>
 		</StackPanel>
 	</Viewbox>
 </Window>
