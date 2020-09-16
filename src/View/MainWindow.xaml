@@ -12,6 +12,7 @@
 			<Style TargetType="Button">
 				<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
 				<Setter Property="Background" Value="{DynamicResource backgroundBrush}"/>
+				<Setter Property="Foreground" Value="{DynamicResource foregroundBrush}"/>
 			</Style>
 		</Viewbox.Resources>
 		<StackPanel Orientation="Horizontal">

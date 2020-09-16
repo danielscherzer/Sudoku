@@ -26,7 +26,7 @@
 							<ItemsControl.ItemTemplate>
 								<DataTemplate>
 									<Viewbox>
-										<TextBlock Foreground="{DynamicResource borderBrush}" Text ="{Binding Value}"
+										<TextBlock Foreground="{DynamicResource foregroundBrush}" Text ="{Binding Value}"
 												   Visibility="{Binding IsValid, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 									</Viewbox>
 								</DataTemplate>
@@ -35,7 +35,7 @@
 				</DataTemplate>
 				<DataTemplate x:Key ="cellTemplate">
 					<TextBlock HorizontalAlignment ="Center" VerticalAlignment ="Center" 
-					   FontSize="24" Foreground="{DynamicResource borderBrush}" Text ="{Binding Value}" 
+					   FontSize="24" Foreground="{DynamicResource foregroundBrush}" Text ="{Binding Value}" 
 					FontWeight="{Binding IsReadOnly, Converter={StaticResource BooleanToFontWeightConverter}}"/>
 				</DataTemplate>
 			</Style.Resources>
@@ -50,7 +50,7 @@
 		<DataTemplate x:Key ="BlockTemplate">
 			<DataTemplate.Resources>
 				<Style x:Key="borderStyle" TargetType="Border" >
-					<Setter Property="BorderBrush" Value="{StaticResource borderBrush}"/>
+					<Setter Property="BorderBrush" Value="{StaticResource foregroundBrush}"/>
 					<Setter Property="Background" Value="{StaticResource backgroundBrush}"/>
 				</Style>
 				<Style x:Key="cellBorder" TargetType="Border" BasedOn="{StaticResource borderStyle}">
@@ -74,7 +74,7 @@
 				<ItemsControl ItemsSource ="{Binding Cells}">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
-							<UniformGrid Background="{DynamicResource borderBrush}"/>
+							<UniformGrid Background="{DynamicResource foregroundBrush}"/>
 						</ItemsPanelTemplate>
 					</ItemsControl.ItemsPanel>
 					<ItemsControl.ItemTemplate>
@@ -93,7 +93,7 @@
 		<ItemsControl ItemsSource ="{Binding Blocks}" ItemTemplate ="{StaticResource BlockTemplate}">
 			<ItemsControl.ItemsPanel>
 				<ItemsPanelTemplate>
-					<UniformGrid Background="{DynamicResource borderBrush}"/>
+					<UniformGrid Background="{DynamicResource foregroundBrush}"/>
 				</ItemsPanelTemplate>
 			</ItemsControl.ItemsPanel>
 		</ItemsControl>
