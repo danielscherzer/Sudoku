@@ -74,7 +74,12 @@ namespace WpfSudoku.ViewModel
 
 		public async Task FillAsync()
 		{
-			var field = await Task.Run(() => Sudoku.Find());
+			var field = await Task.Run(() =>
+			{
+				int[,] field = new int[9, 9];
+				Helper.Benchmark(() => field = Sudoku.Find());
+				return field;
+			});
 			Sudoku.RemoveSome(field, 0.5);
 			ConvertField(field);
 		}
