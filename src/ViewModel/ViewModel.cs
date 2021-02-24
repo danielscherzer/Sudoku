@@ -7,14 +7,14 @@ using System.Runtime.CompilerServices;
 
 namespace WpfSudoku.ViewModel
 {
-	public class ViewModel<DerivedType> : INotifyPropertyChanged where DerivedType : class
+	public class ViewModel<DerivedType> : INotifyPropertyChanged
 	{
 		public ViewModel()
 		{
 			PropertyChanged += ViewModel_PropertyChanged;
 		}
 
-		public event PropertyChangedEventHandler PropertyChanged;
+		public event PropertyChangedEventHandler? PropertyChanged;
 
 		public void AddPropertyChangedHandler(string propertyName, Action handler)
 		{
@@ -35,6 +35,7 @@ namespace WpfSudoku.ViewModel
 
 		protected void Set<Value>(ref Value backendStore, Value value, [CallerMemberName] string propertyName = "")
 		{
+			if (Equals(backendStore, value)) return;
 			var oldValue = backendStore;
 			backendStore = value;
 			NotifyPropertyChanged(oldValue, propertyName);
@@ -112,7 +113,7 @@ namespace WpfSudoku.ViewModel
 					return (e as ConstantExpression)?.Value;
 				case ExpressionType.MemberAccess:
 					{
-						if (!(e is MemberExpression propertyExpression)) return null;
+						if (e is not MemberExpression propertyExpression) return null;
 						var field = propertyExpression.Member as FieldInfo;
 						var property = propertyExpression.Member as PropertyInfo;
 						var container = propertyExpression.Expression == null ? null : Evaluate(propertyExpression.Expression);
@@ -134,6 +135,7 @@ namespace WpfSudoku.ViewModel
 			{
 				if (memberExpression?.Member is PropertyInfo propertyInfo)
 				{
+					if (memberExpression.Expression is null) throw new ArgumentException("Invalid expression given");
 					if (Evaluate(memberExpression.Expression) is DerivedType instanceObject)
 					{
 						propertyName = propertyInfo.Name;
@@ -145,8 +147,9 @@ namespace WpfSudoku.ViewModel
 			throw new InvalidOperationException("Please provide a valid property expression, like '() => instance.PropertyName'.");
 		}
 
-		private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
 		{
+			if (e.PropertyName is null) return;
 			if (handlerData.TryGetValue(e.PropertyName, out var handlerList))
 			{
 				foreach (var handlerData in handlerList)
