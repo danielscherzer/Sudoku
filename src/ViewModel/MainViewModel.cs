@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Zenseless.Patterns;
 
 namespace WpfSudoku.ViewModel
 {
-	public class MainViewModel : ViewModel<MainViewModel>
+	public class MainViewModel : PropertyBinding<MainViewModel>
 	{
 		public MainViewModel()
 		{
@@ -35,7 +36,7 @@ namespace WpfSudoku.ViewModel
 					if (0 != cell.Value && cell.IsValid) _activeNumbers[cell.Value].Count++;
 				}
 			}
-			NotifyPropertyChanged(nameof(ActiveNumbers));
+			RaisePropertyChanged(nameof(ActiveNumbers));
 		}
 	}
 }

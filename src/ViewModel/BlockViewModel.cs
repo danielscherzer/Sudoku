@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Zenseless.Patterns;
 
 namespace WpfSudoku.ViewModel
 {
-	public class BlockViewModel : ViewModel<BlockViewModel>
+	public class BlockViewModel : PropertyBinding<BlockViewModel>
 	{
 		public BlockViewModel(IEnumerable<CellViewModel> cells, int size)
 		{
@@ -31,6 +32,6 @@ namespace WpfSudoku.ViewModel
 
 		public int Size { get; }
 
-		private readonly List<CellViewModel> _cells = new List<CellViewModel>();
+		private readonly List<CellViewModel> _cells = new();
 	}
 }

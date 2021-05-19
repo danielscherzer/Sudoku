@@ -1,6 +1,8 @@
-﻿namespace WpfSudoku.ViewModel
+﻿using Zenseless.Patterns;
+
+namespace WpfSudoku.ViewModel
 {
-	public class ButtonStateViewModel : ViewModel<ButtonStateViewModel>
+	public class ButtonStateViewModel : PropertyBinding<ButtonStateViewModel>
 	{
 		public ButtonStateViewModel(string text)
 		{
@@ -13,7 +15,7 @@
 			set
 			{
 				Set(ref _count, value);
-				NotifyPropertyChanged(nameof(IsFull));
+				RaisePropertyChanged(nameof(IsFull));
 			}
 		}
 		public bool IsFull => 9 == Count;

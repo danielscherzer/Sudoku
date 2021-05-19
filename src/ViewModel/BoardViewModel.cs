@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using WpfSudoku.Model;
+using Zenseless.Patterns;
 
 namespace WpfSudoku.ViewModel
 {
-	public class BoardViewModel : ViewModel<BoardViewModel>
+	public class BoardViewModel : PropertyBinding<BoardViewModel>
 	{
 		public BoardViewModel() : this(3) { }
 

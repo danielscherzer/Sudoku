@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Zenseless.Patterns;
 
 namespace WpfSudoku.ViewModel
 {
-	public class CellViewModel : ViewModel<CellViewModel>
+	public class CellViewModel : PropertyBinding<CellViewModel>
 	{
 		public CellViewModel(int column, int row)
 		{
@@ -27,8 +28,8 @@ namespace WpfSudoku.ViewModel
 				{
 					_values &= ~bit;
 				}
-				NotifyPropertyChanged();
-				NotifyPropertyChanged(nameof(PossibleValues));
+				RaisePropertyChanged();
+				RaisePropertyChanged(nameof(PossibleValues));
 			}
 		}
 
