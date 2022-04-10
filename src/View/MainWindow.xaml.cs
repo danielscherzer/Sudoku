@@ -10,9 +10,9 @@ namespace WpfSudoku.View
 	{
 		public MainWindow()
 		{
-			InitializeComponent();
 			viewModel = new MainViewModel();
 			DataContext = viewModel;
+			InitializeComponent();
 			//CompositionTarget.Rendering += async (s, a) => await viewModel.Board.FillAsync();
 		}
 
