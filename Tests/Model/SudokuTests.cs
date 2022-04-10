@@ -41,7 +41,7 @@ namespace WpfSudoku.Model.Tests
 			}
 		}
 
-		private const int solveTestCount = 20;
+		private const int solveTestCount = 5;
 		[DataTestMethod()]
 		[Timeout(5000 * solveTestCount)]
 		[DataRow(0.0)]
