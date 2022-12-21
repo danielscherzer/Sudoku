@@ -1,6 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using WpfSudoku.Model;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
+using Zenseless.Spatial;
+using System.Diagnostics;
 
 namespace WpfSudoku.Model.Tests
 {
@@ -28,6 +31,49 @@ namespace WpfSudoku.Model.Tests
 																		(0, 0) } };
 		}
 
+		public static void PrintGrid(IReadOnlyGrid<int> grid)
+		{
+			for (int row = 0; row < grid.Rows; ++row)
+			{
+				Debug.Write('|');
+				for (int column = 0; column < grid.Columns; ++column)
+				{
+					Debug.Write(grid[column, row]);
+					Debug.Write('|');
+				}
+				Debug.WriteLine("");
+			}
+		}
+
+		[TestMethod()]
+		public void ValidValuesTest()
+		{
+			for (int i = 0; i < createTestCount; ++i)
+			{
+				var grid = Sudoku.Create();
+				Sudoku.RemoveSome(grid, 0.5);
+				//find empty cell
+				for (int cell = 0; cell < grid.Cells.Length; ++cell)
+				{
+					var (column, row) = grid.GetColRow(cell);
+					var validValues = ValidityChecks.ValidValues(grid, column, row);
+					if (0 == grid.Cells[cell])
+					{
+						foreach (var n in validValues)
+						{
+							grid.Cells[cell] = n; // fill this cell
+							Assert.IsTrue(ValidityChecks.All(grid), "Created field not valid");
+						}
+					}
+					else
+					{
+						Assert.AreEqual(0, validValues.Count);
+					}
+				}
+			}
+		}
+
+
 		private const int createTestCount = 500;
 		[TestMethod()]
 		[Timeout(100 * createTestCount)]
@@ -37,13 +83,13 @@ namespace WpfSudoku.Model.Tests
 			{
 				var field = Sudoku.Create();
 				Assert.IsTrue(ValidityChecks.All(field), "Created field not valid");
-				Assert.IsFalse(field.Array.Any(value => value == 0), "Created field has 0 cells");
+				Assert.IsFalse(field.Cells.Any(value => value == 0), "Created field has 0 cells");
 			}
 		}
 
-		private const int solveTestCount = 5;
+		private const int solveTestCount = 100;
 		[DataTestMethod()]
-		[Timeout(5000 * solveTestCount)]
+		[Timeout(500 * solveTestCount)]
 		[DataRow(0.0)]
 		[DataRow(1.0)]
 		[DataRow(0.1)]
@@ -51,15 +97,39 @@ namespace WpfSudoku.Model.Tests
 		[DataRow(0.5)]
 		[DataRow(0.8)]
 		[DataRow(0.9)]
-		public void SolveTest(double emptyFieldPropability)
+		public void SolveBackTrackTest(double emptyFieldPropability)
 		{
 			for (int i = 0; i < solveTestCount; ++i)
 			{
-				var field = Sudoku.Create();
-				Sudoku.RemoveSome(field, emptyFieldPropability);
-				Sudoku.Solve(field);
-				Assert.IsTrue(ValidityChecks.All(field), "Solved field not valid.");
-				Assert.IsFalse(field.Array.Any(value => value == 0), "Solved field has 0 cells.");
+				var grid = Sudoku.Create();
+				Sudoku.RemoveSome(grid, emptyFieldPropability);
+				Sudoku.SolveBacktrack(grid);
+				PrintGrid(grid);
+				Assert.IsTrue(ValidityChecks.All(grid), "Solved field not valid.");
+				Assert.IsFalse(grid.Cells.Any(value => value == 0), "Solved field has 0 cells.");
+			}
+		}
+
+		[DataTestMethod()]
+		[Timeout(500 * solveTestCount)]
+		[DataRow(0.1)]
+		[DataRow(0.0)]
+		[DataRow(1.0)]
+		[DataRow(0.2)]
+		[DataRow(0.5)]
+		[DataRow(0.8)]
+		[DataRow(0.9)]
+		public void SolveBestFirstTest(double emptyFieldPropability)
+		{
+			for (int i = 0; i < solveTestCount; ++i)
+			{
+				var grid = Sudoku.Create();
+				Sudoku.RemoveSome(grid, emptyFieldPropability);
+				PrintGrid(grid);
+				Sudoku.SolveBestFirst(grid);
+				PrintGrid(grid);
+				Assert.IsTrue(ValidityChecks.All(grid), "Solved field not valid.");
+				Assert.IsFalse(grid.Cells.Any(value => value == 0), "Solved field has 0 cells.");
 			}
 		}
 	}

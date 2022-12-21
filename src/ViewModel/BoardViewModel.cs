@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using WpfSudoku.Model;
 using Zenseless.Patterns;
+using Zenseless.Spatial;
 
 namespace WpfSudoku.ViewModel
 {
@@ -76,11 +77,11 @@ namespace WpfSudoku.ViewModel
 		{
 			var field = await Task.Run(() =>
 			{
-				var field = new UniformGrid<int>(9);
-				Helper.Benchmark(() => field = Sudoku.Create());
+				var field = new Grid<int>(9, 9);
+				Helper.Benchmark(() => field = Sudoku.Create(-1));
 				return field;
 			});
-			Sudoku.RemoveSome(field, 0.5);
+			Sudoku.RemoveSome(field, 0.5, -1);
 			ConvertField(field);
 		}
 
@@ -89,19 +90,19 @@ namespace WpfSudoku.ViewModel
 			var field = ToField();
 			await Task.Run(() =>
 			{
-				Helper.Benchmark(() => Sudoku.Solve(field));
+				Helper.Benchmark(() => Sudoku.SolveBacktrack(field));
 			});
 			ConvertField(field);
 		}
 
-		private readonly List<CellViewModel> _cells = new List<CellViewModel>();
+		private readonly List<CellViewModel> _cells = new();
 		private CellViewModel GetCell(int col, int row) => _cells[col + Size * Size * row];
 
-		private void ConvertField(UniformGrid<int> field)
+		private void ConvertField(Grid<int> field)
 		{
-			for (int row = 0; row < field.Size; ++row)
+			for (int row = 0; row < field.Rows; ++row)
 			{
-				for (int column = 0; column < field.Size; ++column)
+				for (int column = 0; column < field.Columns; ++column)
 				{
 					var cell = GetCell(column, row);
 					cell.Reset();
@@ -182,9 +183,9 @@ namespace WpfSudoku.ViewModel
 			}
 		}
 
-		private UniformGrid<int> ToField()
+		private Grid<int> ToField()
 		{
-			var field = new UniformGrid<int>(9);
+			var field = new Grid<int>(9, 9);
 			foreach (var cell in _cells)
 			{
 				field[cell.Column, cell.Row] = (int)cell.Value;

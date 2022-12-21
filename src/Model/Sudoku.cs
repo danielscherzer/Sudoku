@@ -1,24 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using Zenseless.Patterns;
+using Zenseless.Spatial;
 
 namespace WpfSudoku.Model
 {
 	public static class Sudoku
 	{
-		public static UniformGrid<int> Create()
+		public static Grid<int> Create(int seed = 0)
 		{
-			var rnd = new Random();
+			if (-1 == seed) seed = (int)(DateTime.Now.Ticks % int.MaxValue);
+			var rnd = new Random(seed);
 			const int size = 9;
 			const int ss = size * size;
-			var field = new UniformGrid<int>(size);
-			var tries = new int[ss];
-			//each cell has its own order of trying the numbers 1-9
-			var allChoicesRnd = new int[ss][];
+			var field = new Grid<int>(size, size);
+			var tries = new int[ss]; // try count for each cell
+			var allChoicesRnd = new int[ss][]; //each cell gets a randomized order of trying the numbers 1-9
 			for (int i = 0; i < ss; ++i)
 			{
-				var valueList = Enumerable.Range(1, 9).ToArray(); // performance side-note: this line is quicker inside of the for loop, then outside!?
-				Shuffle(valueList, rnd);
+				var valueList = Enumerable.Range(1, 9).ToArray(); // create each new so allChoices has distinct arrays
+				rnd.Shuffle(valueList);
 				allChoicesRnd[i] = valueList;
 			}
 
@@ -31,11 +34,11 @@ namespace WpfSudoku.Model
 					{
 						// tried all choices for this cell -> backtrack
 						tries[i] = 0;
-						field.Array[i] = 0;
+						field.Cells[i] = 0;
 						i -= 2;
 						break;
 					}
-					field.Array[i] = allChoicesRnd[i][tries[i] - 1];
+					field.Cells[i] = allChoicesRnd[i][tries[i] - 1];
 
 				} while (!ValidityChecks.All(field));
 			}
@@ -73,70 +76,115 @@ namespace WpfSudoku.Model
 			}
 		}
 
-		public static void RemoveSome(UniformGrid<int> field, double propability)
+		public static void RemoveSome(Grid<int> field, double propability, int seed = 0)
 		{
-			var rnd = new Random();
-			for (int i = 0; i < field.Size * field.Size; ++i)
+			if (-1 == seed) seed = (int)(DateTime.Now.Ticks % int.MaxValue);
+			var rnd = new Random(seed);
+			for (int i = 0; i < field.Cells.Length; ++i)
 			{
 				if (rnd.NextDouble() < propability)
 				{
-					field.Array[i] = 0;
+					field.Cells[i] = 0;
 				}
 			}
 		}
 
-		public static HashSet<int> SimplePossibleChoices(UniformGrid<int> field, int x, int y, int blockSize)
+		public static bool SolveBacktrack(Grid<int> grid)
 		{
-			int[] fullSet = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-			var possibleChoices = new HashSet<int>(fullSet);
-			foreach ((var column, var row) in InterdependentFields(x, y, blockSize))
+			Debug.Assert(9 == grid.Columns);
+			Debug.Assert(9 == grid.Rows);
+			void PlaceNumber(int pos)
 			{
-				possibleChoices.Remove(field[column, row]);
-			}
-			return possibleChoices;
-		}
-
-		public static void Solve(UniformGrid<int> field)
-		{
-			// only need to solve empty cells
-			var emptyFieldIds = new List<int>();
-			for (int i = 0; i < field.Size * field.Size; ++i)
-			{
-				if(0 == field.Array[i])
+				// check if we are beyond the last position in the grid
+				if (pos == 81)
 				{
-					emptyFieldIds.Add(i);
+					throw new ApplicationException("Finished!");
 				}
-			}
-
-			var choices = new int[emptyFieldIds.Count];
-			for (int i = 0; i < emptyFieldIds.Count; ++i)
-			{
-				var currentId = emptyFieldIds[i];
-				do
+				if (grid.Cells[pos] > 0)
 				{
-					choices[i]++;
-					if (choices[i] > 9)
+					//cell already filled -> go to next position in grid
+					PlaceNumber(pos + 1);
+				}
+				else
+				{
+					var (column, row) = grid.GetColRow(pos);
+					//cell not filled -> try all numbers
+					for (int n = 1; n <= 9; ++n)
 					{
-						// tried all choices for this cell -> backtrack
-						choices[i] = 0;
-						field.Array[currentId] = 0;
-						i -= 2;
-						break;
+						if (ValidityChecks.CheckCell(grid, column, row, n))
+						{
+							grid.Cells[pos] = n; // place a number and go to next cell
+							PlaceNumber(pos + 1);
+							grid.Cells[pos] = 0; // back track
+						}
 					}
-					field.Array[currentId] = choices[i];
-
-				} while (!ValidityChecks.All(field));
+				}
+			}
+			try
+			{
+				PlaceNumber(0);
+				return false;
+			}
+			catch (ApplicationException)
+			{
+				return true;
 			}
 		}
 
-		private static void Shuffle(int[] numbers, Random rnd)
+		public static bool SolveBestFirst(Grid<int> grid)
 		{
-			for (int i = numbers.Length - 1; i > 0; i--)
+			Debug.Assert(9 == grid.Columns);
+			Debug.Assert(9 == grid.Rows);
+
+			(int, HashSet<int>) FindEmptyWithMinPossibleValues()
 			{
-				int rndId = rnd.Next(i);
-				var temp = numbers[i];
-				numbers[i] = numbers[rndId];
-				numbers[rndId] = temp;
+				int min = int.MaxValue;
+				int minId = -1;
+				HashSet<int> result = new();
+				for (int cell = 0; cell < grid.Cells.Length; ++cell)
+				{
+					if (0 == grid.Cells[cell])
+					{
+						var (column, row) = grid.GetColRow(cell);
+						var validValues = ValidityChecks.ValidValues(grid, column, row);
+						int count = validValues.Count;
+						if (count < min)
+						{
+							min = count;
+							minId = cell;
+							result = validValues;
+						}
+					}
+				}
+				return (minId, result);
+			}
+
+			void PlaceNumber()
+			{
+				(int cell, var validValues) = FindEmptyWithMinPossibleValues();
+				// check if no empty cells
+				if (cell == -1)
+				{
+					throw new ApplicationException("Finished!");
+				}
+				var (column, row) = grid.GetColRow(cell);
+				//cell not filled -> try all valid values
+				foreach(var n in validValues)
+				{
+					grid.Cells[cell] = n; // fill this cell and go to next free cell
+					PlaceNumber();
+					grid.Cells[cell] = 0;
+				}
+			}
+
+			try
+			{
+				PlaceNumber();
+				return false;
+			}
+			catch (ApplicationException)
+			{
+				return true;
 			}
 		}
 	}
