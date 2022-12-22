@@ -135,7 +135,6 @@ namespace WpfSudoku.Model
 		{
 			Debug.Assert(9 == grid.Columns);
 			Debug.Assert(9 == grid.Rows);
-
 			(int, HashSet<int>) FindEmptyWithMinPossibleValues()
 			{
 				int min = int.MaxValue;
@@ -153,6 +152,7 @@ namespace WpfSudoku.Model
 							min = count;
 							minId = cell;
 							result = validValues;
+							if (1 == min) return (minId, result); // only one choice -> better is not possible
 						}
 					}
 				}
@@ -163,13 +163,13 @@ namespace WpfSudoku.Model
 			{
 				(int cell, var validValues) = FindEmptyWithMinPossibleValues();
 				// check if no empty cells
-				if (cell == -1)
+				if (-1 == cell)
 				{
 					throw new ApplicationException("Finished!");
 				}
 				var (column, row) = grid.GetColRow(cell);
 				//cell not filled -> try all valid values
-				foreach(var n in validValues)
+				foreach (var n in validValues)
 				{
 					grid.Cells[cell] = n; // fill this cell and go to next free cell
 					PlaceNumber();
@@ -186,6 +186,38 @@ namespace WpfSudoku.Model
 			{
 				return true;
 			}
+		}
+
+		public static bool SolveExactCover(Grid<int> grid)
+		{
+			Debug.Assert(9 == grid.Columns);
+			Debug.Assert(9 == grid.Rows);
+			const int numberInColInRow = 9 * 9 * 9;
+			const int constrains = 9 * 9 * 4;
+			DLX solver = new(constrains, numberInColInRow);
+			for (int row = 0, cell = 0; row < 9; ++row)
+			{
+				for (int column = 0; column < 9; ++column)
+				{
+					int box = row / 3 * 3 + column / 3;
+					for (int digit = 0; digit < 9; ++digit)
+					{
+						solver.AddRow(cell, 81 + row * 9 + digit, 2 * 81 + column * 9 + digit, 3 * 81 + box * 9 + digit);
+					}
+					cell++;
+				}
+			}
+			for (int i = 0; i < 81; ++i)
+			{
+				var value = grid.Cells[i];
+				if (0 != value) solver.Give(i * 9 + grid.Cells[i] - 1);
+			}
+			var solution = solver.Solutions().First();
+			foreach (int r in solution)
+			{
+				grid.Cells[r / 81 * 9 + r / 9 % 9] = r % 9 + 1;
+			}
+			return true;
 		}
 	}
 }

@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Zenseless.Spatial;
 using System.Diagnostics;
+using System;
+using System.Text;
+using System.Windows.Controls;
 
 namespace WpfSudoku.Model.Tests
 {
@@ -31,8 +34,26 @@ namespace WpfSudoku.Model.Tests
 																		(0, 0) } };
 		}
 
+		public static string GridString(int[] grid)
+		{
+			var sb = new StringBuilder();
+			sb.AppendLine(string.Concat(Enumerable.Repeat('=', 18)));
+			for (int row = 0; row < 9; ++row)
+			{
+				sb.Append('|');
+				for (int column = 0; column < 9; ++column)
+				{
+					sb.Append(grid[column + 9* row]);
+					sb.Append('|');
+				}
+				sb.AppendLine();
+			}
+			return sb.ToString();
+		}
+
 		public static void PrintGrid(IReadOnlyGrid<int> grid)
 		{
+			Debug.WriteLine(string.Concat(Enumerable.Repeat('=', 18)));
 			for (int row = 0; row < grid.Rows; ++row)
 			{
 				Debug.Write('|');
@@ -87,26 +108,26 @@ namespace WpfSudoku.Model.Tests
 			}
 		}
 
+		private const int seed = 1245;
 		private const int solveTestCount = 100;
 		[DataTestMethod()]
 		[Timeout(500 * solveTestCount)]
 		[DataRow(0.0)]
 		[DataRow(1.0)]
 		[DataRow(0.1)]
-		[DataRow(0.2)]
-		[DataRow(0.5)]
-		[DataRow(0.8)]
-		[DataRow(0.9)]
+		//[DataRow(0.2)]
+		//[DataRow(0.5)]
+		//[DataRow(0.8)]
+		//[DataRow(0.9)]
 		public void SolveBackTrackTest(double emptyFieldPropability)
 		{
 			for (int i = 0; i < solveTestCount; ++i)
 			{
-				var grid = Sudoku.Create();
-				Sudoku.RemoveSome(grid, emptyFieldPropability);
+				var grid = Sudoku.Create(seed + i);
+				Sudoku.RemoveSome(grid, emptyFieldPropability, seed + i);
+				var original = (int[])grid.Cells.Clone();
 				Sudoku.SolveBacktrack(grid);
-				PrintGrid(grid);
-				Assert.IsTrue(ValidityChecks.All(grid), "Solved field not valid.");
-				Assert.IsFalse(grid.Cells.Any(value => value == 0), "Solved field has 0 cells.");
+				AssertIsSolutionTo(original, grid);
 			}
 		}
 
@@ -123,14 +144,45 @@ namespace WpfSudoku.Model.Tests
 		{
 			for (int i = 0; i < solveTestCount; ++i)
 			{
-				var grid = Sudoku.Create();
-				Sudoku.RemoveSome(grid, emptyFieldPropability);
-				PrintGrid(grid);
+				var grid = Sudoku.Create(seed + i);
+				Sudoku.RemoveSome(grid, emptyFieldPropability, seed + i);
+				var original = (int[])grid.Cells.Clone();
 				Sudoku.SolveBestFirst(grid);
-				PrintGrid(grid);
-				Assert.IsTrue(ValidityChecks.All(grid), "Solved field not valid.");
-				Assert.IsFalse(grid.Cells.Any(value => value == 0), "Solved field has 0 cells.");
+				AssertIsSolutionTo(original, grid);
 			}
+		}
+
+		[DataTestMethod()]
+		[Timeout(500 * solveTestCount)]
+		[DataRow(0.1)]
+		[DataRow(0.0)]
+		[DataRow(1.0)]
+		[DataRow(0.2)]
+		[DataRow(0.5)]
+		[DataRow(0.8)]
+		[DataRow(0.9)]
+		public void SolveExactCoverTest(double emptyFieldPropability)
+		{
+			for (int i = 0; i < solveTestCount; ++i)
+			{
+				Grid<int> grid = Sudoku.Create(seed + i);
+				Sudoku.RemoveSome(grid, emptyFieldPropability, seed + i);
+				var original = (int[])grid.Cells.Clone();
+				Sudoku.SolveExactCover(grid);
+				AssertIsSolutionTo(original, grid);
+			}
+		}
+
+		private static void AssertIsSolutionTo(int[] original, IReadOnlyGrid<int> solution)
+		{
+			for (int i = 0; i < original.Length; ++i)
+			{
+				var o = original[i];
+				var n = solution.Cells[i];
+				if (0 == n) throw new AssertFailedException("Solution has 0 cells:\n" + GridString(solution.Cells));
+				if (o != n && 0 != o) throw new AssertFailedException("Solution does not match!\nOriginal\n"+ GridString(original) + " Solution:" + GridString(solution.Cells));
+			}
+			Assert.IsTrue(ValidityChecks.All(solution), "Solved field not valid.");
 		}
 	}
 }
