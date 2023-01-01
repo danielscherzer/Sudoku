@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace WpfSudoku.Model
@@ -16,18 +17,22 @@ namespace WpfSudoku.Model
 		{
 			columns = new List<Header>(columnCapacity);
 			rows = new List<Node>(rowCapacity);
+			void AddHeader()
+			{
+				Header h = new(root.Left, root);
+				h.AttachLeftRight();
+				columns.Add(h);
+			}
 			for (int i = 0; i < columnCapacity; i++) AddHeader();
-		}
-
-		private void AddHeader()
-		{
-			Header h = new(root.Left, root);
-			h.AttachLeftRight();
-			columns.Add(h);
 		}
 
 		public void AddRow(params int[] newRow)
 		{
+			//Debug.WriteLine(rows.Count);
+			//Debug.WriteLine(string.Join(',', newRow));
+			//Debug.WriteLine(newRow[2] % 9 + 1);
+			//Debug.WriteLine(newRow[3] % 9 + 1);
+
 			Node AddFirstNode(int column, int row)
 			{
 				Node n = new(null, null, columns[column].Up, columns[column], columns[column], row);
@@ -54,6 +59,22 @@ namespace WpfSudoku.Model
 			}
 		}
 
+		public IEnumerable<List<int>> Rows()
+		{
+			var colNumbers = columns.Select((v, i) => (v, i)).Where(x => x.v.Size > 0).ToDictionary(x => x.v, x => x.i);
+			foreach(var row in rows)
+			{
+				var result = new List<int>();
+				var it = row;
+				do
+				{
+					result.Add(colNumbers[it.Head]);
+					it = it.Right;
+				} while(it != row);
+				yield return result;
+			}
+		}
+
 		public void Give(int row)
 		{
 			solutionNodes.Push(rows[row]);
@@ -75,7 +96,7 @@ namespace WpfSudoku.Model
 							yield return solutionNodes.Select(n => n.Row).ToArray();
 						}
 						if (solutionNodes.Count > initial)
-						{
+						{	//backtack
 							node = solutionNodes.Pop();
 							UncoverMatrix(node);
 							node = node.Down;

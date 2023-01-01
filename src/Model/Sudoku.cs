@@ -202,10 +202,23 @@ namespace WpfSudoku.Model
 					int box = row / 3 * 3 + column / 3;
 					for (int digit = 0; digit < 9; ++digit)
 					{
+						//a row is a choice of a certain number at a certain place in the grid
+						//each row has 4x"1" entry for each of the 4 constrains this choice satisfies:
+						//columns 0ff: 81 cell constrains
+						//columns 81ff: 81 row constrains
+						//columns 2*81ff: 81 column constrains
+						//columns 3*81ff: 81 box constrains
 						solver.AddRow(cell, 81 + row * 9 + digit, 2 * 81 + column * 9 + digit, 3 * 81 + box * 9 + digit);
 					}
 					cell++;
 				}
+			}
+			foreach(var row in solver.Rows())
+			{
+				//Debug.WriteLine(string.Join(',', row));
+				//Debug.WriteLine(row[1] % 9 + 1);
+				//Debug.WriteLine(row[2] % 9 + 1);
+				//Debug.WriteLine(row[3] % 9 + 1);
 			}
 			for (int i = 0; i < 81; ++i)
 			{
